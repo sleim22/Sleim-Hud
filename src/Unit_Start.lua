@@ -140,7 +140,7 @@ function printNewRadarContacts()
     end
 end
 
-function updateRadarInfo()
+function updateTargetWidget()
     targetId = radar_1.getTargetId()
     if targetId == 0 then 
         targetName = "No Target selected"
@@ -170,15 +170,6 @@ function updateRadarInfo()
         oldTargetDistance = targetDistance
         oldSpeed = targetSpeed
     end
-end
-
-function updateTargetWidget()    
-    probil = math.floor(json.decode(weapon_1.getData()).properties.hitProbability * 100)
-    system.updateData(targetTitelData,'{"text": "'..targetName..'"}')
-    system.updateData(hitChance,'{"label": "Hit Chance", "value": "'..probil..'","unit":"%"}')
-    system.updateData(speed,'{"label": "Speed", "value": "'..speedChangeIcon..targetSpeed..'","unit":"km/h"}')
-    system.updateData(targetHitChanceData,'{"percentage":'..probil..'}')
-    
     if targetDistance < 1000 then
         distanceUnit= "m" 
     elseif targetDistance < 100000 then
@@ -188,6 +179,11 @@ function updateTargetWidget()
         targetDistance = targetDistance/200000
         distanceUnit= "su"
     end
+    probil = math.floor(json.decode(weapon_1.getData()).properties.hitProbability * 100)
+    system.updateData(targetTitelData,'{"text": "'..targetName..'"}')
+    system.updateData(hitChance,'{"label": "Hit Chance", "value": "'..probil..'","unit":"%"}')
+    system.updateData(speed,'{"label": "Speed", "value": "'..speedChangeIcon..targetSpeed..'","unit":"km/h"}')
+    system.updateData(targetHitChanceData,'{"percentage":'..probil..'}')
     system.updateData(distance,'{"label": "Distance", "value": "'..distanceChangeIcon..""..string.format('%0.2f',targetDistance)..'","unit":"'..distanceUnit..'"}')
 end
 
@@ -201,7 +197,6 @@ function getMaxCorestress()
 end
 
 function drawShield()
-
     shieldHp = shield_1.getShieldHitpoints()
     shieldPercent = shieldHp/shieldMax*100
     if shieldPercent == 100 then shieldPercent = "100"
@@ -210,83 +205,79 @@ function drawShield()
     end    
     coreStressPercent = string.format('%0.2f',core.getCoreStressRatio()*100)
     local shieldHealthBar= [[
-<style>
-.health-bar {
-    position: fixed;
-    width: 13em; 
-    padding: 1vh; 
-    bottom: 5vh;
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
-    background: #142027;
-    opacity: 0.8;
-    color: white;
-    font-family: "Lucida" Grande, sans-serif;
-    font-size: 1.5em;
-    border-radius: 5vh;
-    border: 0.2vh solid;
-    border-color: #098dfe;
-}
-.bar {
-    padding: 5px;
-    border-radius: 5vh;
-    background: #09c3fe;
-    opacity: 0.8;
-    width: ]]..shieldPercent..[[%;
-    height: 40px;
-    position: relative;
-}
+    <style>
+    .health-bar {
+        position: fixed;
+        width: 13em; 
+        padding: 1vh; 
+        bottom: 5vh;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        background: #142027;
+        opacity: 0.8;
+        color: white;
+        font-family: "Lucida" Grande, sans-serif;
+        font-size: 1.5em;
+        border-radius: 5vh;
+        border: 0.2vh solid;
+        border-color: #098dfe;
+    }
+    .bar {
+        padding: 5px;
+        border-radius: 5vh;
+        background: #09c3fe;
+        opacity: 0.8;
+        width: ]]..shieldPercent..[[%;
+        height: 40px;
+        position: relative;
+    }
 
 
-</style>
-<html>
-<div class="health-bar">
-  <div class="bar">]]..venting..shieldPercent..[[%
-    
-  </div>
-</div>
-</html>
-]]
-local coreStressBar= [[
-<style>
-.stress-health-bar {
-    position: fixed;
-    width: 13em; 
-    padding: 1vh; 
-    bottom:]]..stressBarHeight..[[vh;
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
-    background: #142027;
-    opacity: 0.8;
-    color: white;
-    font-family: "Lucida" Grande, sans-serif;
-    font-size: 1.5em;
-    border-radius: 5vh;
-    border: 0.2vh solid;
-    border-color: #a00000;
-}
-.stress-bar {
-    padding: 5px;
-    border-radius: 5vh;
-    background: #ff0000;
-    opacity: 0.8;  
-    width: ]]..coreStressPercent..[[%;
-    height: 40px;
-    position: relative;
-}
+    </style>
+    <html>
+        <div class="health-bar">
+            <div class="bar">]]..venting..shieldPercent..[[%</div>
+        </div>
+    </html>
+    ]]
+    local coreStressBar= [[
+    <style>
+    .stress-health-bar {
+        position: fixed;
+        width: 13em; 
+        padding: 1vh; 
+        bottom:]]..stressBarHeight..[[vh;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        background: #142027;
+        opacity: 0.8;
+        color: white;
+        font-family: "Lucida" Grande, sans-serif;
+        font-size: 1.5em;
+        border-radius: 5vh;
+        border: 0.2vh solid;
+        border-color: #a00000;
+    }
+    .stress-bar {
+        padding: 5px;
+        border-radius: 5vh;
+        background: #ff0000;
+        opacity: 0.8;  
+        width: ]]..coreStressPercent..[[%;
+        height: 40px;
+        position: relative;
+    }
 
 
-</style>
-<html>
-<div class="stress-health-bar">
-  <div class="stress-bar">]]..coreStressPercent..[[%
-    
-  </div>
-</div>
-</html>
-]]
+    </style>
+    <html>
+        <div class="stress-health-bar">
+            <div class="stress-bar">]]..coreStressPercent..[[%</div>
+        </div>
+    </html>
+    ]]
     if shield_1.isVenting() == 1 then
         stressBarHeight = "15"
         venting = "Venting "
@@ -299,7 +290,6 @@ local coreStressBar= [[
         venting = ""
         healthHtml = shieldHealthBar
     end
-
 end
 
 function contains(tablelist, val)
@@ -311,106 +301,96 @@ function contains(tablelist, val)
        return false
     end
 function updateRadar(r,match)
-        allies={}
-        local allyCounter = 1
-        local threatCounter = 1
-        threats={}
-        local data = radar_1.getData()
-         if string.len(data) < 120000 then  
-            local constructList = data:gmatch('({"constructId":".-%b{}.-})') 
-            local list = {}
-            for str in constructList do
-                local id = tonumber(str:match('"constructId":"([%d]*)"'))
-                local tagged = radar_1.hasMatchingTransponder(id) == 0 and true or false
-                if radar_1.hasMatchingTransponder(id)==1 then
-                    allies[allyCounter]=id
-                    allyCounter = allyCounter +1
-                end
-                if radar_1.getThreatFrom(id) ~= "none" then
-                    threats[threatCounter]=id
-                    threatCounter = threatCounter +1
-                end 
-                local ident = radar_1.isConstructIdentified(id) == 1
-                local randomid = getShortName(id)
-                str = string.gsub(str, 'name":"', 'name":"'..randomid..' - ')
-                if CFCS_locked then 
-                    if match and tagged and ident and not contains(tablelist, id) then
-                        list[#list+1] = str
-                    elseif not match and ident and (contains(tablelist, id) or not tagged) then
-                        list[#list+1] = str
-                    end
-                else
-                    if match and tagged and not contains(tablelist, id) then
-                        list[#list+1] = str
-                    elseif not match and (contains(tablelist, id) or not tagged) then
-                        list[#list+1] = str
-                    end
-                end
+    allies={}
+    local allyCounter = 1
+    local threatCounter = 1
+    threats={}
+    local data = radar_1.getData()
+    if string.len(data) < 120000 then  
+        local constructList = data:gmatch('({"constructId":".-%b{}.-})') 
+        local list = {}
+        for str in constructList do
+            local id = tonumber(str:match('"constructId":"([%d]*)"'))
+            local tagged = radar_1.hasMatchingTransponder(id) == 0 and true or false
+            if radar_1.hasMatchingTransponder(id)==1 then
+                allies[allyCounter]=id
+                allyCounter = allyCounter +1
             end
-        return '{"constructsList":['..table.concat(list,',')..'],'..data:match('"elementId":".+')
-    end
-end
-    tablelist = {}    
-    radarOnlyEnemeies = true
-    fm = 'Enemies'
-    rf = ''
-    FCS_locked = false
-    local _data = updateRadar(radar,radarOnlyEnemeies)
-        
-    local _panel = system.createWidgetPanel("RADAR")
-    local _widget = system.createWidget(_panel, "value")
-    radarFilter = system.createData('{"label":"Filter","'..fm..''..rf..'","unit": ""}') 
-    system.addDataToWidget(radarFilter, _widget)
-    local _widget = system.createWidget(_panel, "radar")
-    radarData = system.createData(_data) 
-    system.addDataToWidget(radarData, _widget)
+            if radar_1.getThreatFrom(id) ~= "none" then
+                threats[threatCounter]=id
+                threatCounter = threatCounter +1
+            end 
+            local ident = radar_1.isConstructIdentified(id) == 1
+            local randomid = getShortName(id)
+            str = string.gsub(str, 'name":"', 'name":"'..randomid..' - ')
 
-    allyAmount = 0
-    function getAlliedInfo()
-        local htmlAllies = ""
-        allyAmount = #allies
-        local tooMany = false
-        if allyAmount > maxAllies then tooMany = true end
-        
-        for i=1, #allies do
-            if i < (maxAllies+1) then
-                local id = allies[i]
-                local allyShipInfo = "["..radar_1.getConstructCoreSize(id).."]-"..getShortName(id).."- "..radar_1.getConstructName(id)
-                local owner = getFriendlyDetails(id)
-                htmlAllies = htmlAllies..[[<tr>
-                    <td>]]..allyShipInfo..[[</td>
-                    <td>]]..owner..[[</td>
-                    </tr>]]
-            end
+            if match and tagged then
+                list[#list+1] = str
+            elseif not match and not tagged) then
+                list[#list+1] = str
+            end               
         end
-        if tooMany then
+    return '{"constructsList":['..table.concat(list,',')..'],'..data:match('"elementId":".+')
+end
+radarOnlyEnemeies = true
+fm = 'Enemies'
+rf = ''
+FCS_locked = false
+local _data = updateRadar(radar,radarOnlyEnemeies)
+    
+local _panel = system.createWidgetPanel("RADAR")
+local _widget = system.createWidget(_panel, "value")
+radarFilter = system.createData('{"label":"Filter","'..fm..''..rf..'","unit": ""}') 
+system.addDataToWidget(radarFilter, _widget)
+local _widget = system.createWidget(_panel, "radar")
+radarData = system.createData(_data) 
+system.addDataToWidget(radarData, _widget)
+
+allyAmount = 0
+function getAlliedInfo()
+    local htmlAllies = ""
+    allyAmount = #allies
+    local tooMany = false
+    if allyAmount > maxAllies then tooMany = true end    
+    for i=1, #allies do
+        if i < (maxAllies+1) then
+            local id = allies[i]
+            local allyShipInfo = "["..radar_1.getConstructCoreSize(id).."]-"..getShortName(id).."- "..radar_1.getConstructName(id)
+            local owner = getFriendlyDetails(id)
             htmlAllies = htmlAllies..[[<tr>
-                    <td colspan="2">Plus ]]..(allyAmount-maxAllies)..[[ more allies</td>
-                    </tr>]]
+                <td>]]..allyShipInfo..[[</td>
+                <td>]]..owner..[[</td>
+                </tr>]]
         end
-        return htmlAllies
     end
-    function alliesHead()
-        if allyAmount == 0 then
-            return ""
-        else
-           local alliesHead =[[<tr>
-          <th style="width:90%">ShipInfo</th>
-          <th style="width:10%">Owner</th>
-        </tr>]]
-           return alliesHead
-        end 
+    if tooMany then
+        htmlAllies = htmlAllies..[[<tr>
+                <td colspan="2">Plus ]]..(allyAmount-maxAllies)..[[ more allies</td>
+                </tr>]]
     end
-    function drawAlliesHtml()
+    return htmlAllies
+end
+function alliesHead()
+    if allyAmount == 0 then
+        return ""
+    else
+       local alliesHead =[[<tr>
+      <th style="width:90%">ShipInfo</th>
+      <th style="width:10%">Owner</th>
+    </tr>]]
+       return alliesHead
+    end 
+end
+function drawAlliesHtml()
     alliesHtml = [[
     <html>
-    <div class="allies">
-    <table class="customTable">
-      <thead>
-        <h2>Targets: ]]..(#radar_1.getConstructIds()-allyAmount)..[[</h2><br>
-        <h2>Allies: ]]..allyAmount..[[</h2><br>]]..alliesHead()..[[</thead>
-      <tbody>]]..getAlliedInfo()..[[</tbody>
-    </table></div>
+        <div class="allies">
+        <table class="customTable">
+            <thead>
+                <h2>Targets: ]]..(#radar_1.getConstructIds()-allyAmount)..[[</h2><br>
+                <h2>Allies: ]]..allyAmount..[[</h2><br>]]..alliesHead()..[[</thead>
+            <tbody>]]..getAlliedInfo()..[[</tbody>
+        </table></div>
     </html>]]
 end
 function drawThreatsHtml()
@@ -419,11 +399,12 @@ function drawThreatsHtml()
         if threatsAmount == 0 then
             return ""
         else
-           local threatsHead =[[<tr>
-          <th style="width:90%">ShipInfo</th>
-          <th style="width:10%">Threat Lvl</th>
-        </tr>]]
-           return threatsHead
+            local threatsHead =[[
+            <tr>
+                <th style="width:90%">ShipInfo</th>
+                <th style="width:10%">Threat Lvl</th>
+            </tr>]]
+            return threatsHead
         end 
     end
     function getThreatsInfo()
@@ -468,10 +449,10 @@ end
 
 cssAllyLocked =[[<style>
     .allies {
-      position: fixed;
-      top: 25px;
-      width: 15%;
-      color: white;
+        position: fixed;
+        top: 25px;
+        width: 15%;
+        color: white;
     }
     .locked {
         position: fixed;
@@ -481,9 +462,9 @@ cssAllyLocked =[[<style>
         color: red;
     }
     table.customTable {
-      border-collapse: collapse;
-      border-width: 2px;
-      background: #142027;
+        border-collapse: collapse;
+        border-width: 2px;
+        background: #142027;
         opacity: 0.8;
         font-family: "Lucida" Grande, sans-serif;
         font-size: 12px;
@@ -493,11 +474,11 @@ cssAllyLocked =[[<style>
     }
 
     table.customTable td, table.customTable th {
-      border-width: 2px;
-      border-color: #7EA8F8;
-      border-style: solid;
-      border-radius: 5px;
-      padding: 5px;
+        border-width: 2px;
+        border-color: #7EA8F8;
+        border-style: solid;
+        border-radius: 5px;
+        padding: 5px;
     }
     .h2{
         font-family: "Lucida" Grande, sans-serif;
