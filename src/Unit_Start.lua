@@ -5,6 +5,7 @@
                 showThreats = true --export: adds info about Threats
                 printSZContacts = false --export: print new Contacs in Safezone, default off
                 printLocationOnContact = true --export: print own location on new target
+                showTime = true --export: Shows Time when new Targets enter radar range or leave
                 maxAllies = 10 --export: max Amount for detailed info about Allies, reduce if overlapping with threat info
                 probil = 0
                 targetSpeed = 0
@@ -71,6 +72,19 @@
                     local c = (b*653276)%8388593
                     return kCharSet[a%kCharSetSize+1] .. kCharSet[b%kCharSetSize+1] .. kCharSet[c%kCharSetSize+1]
                 end
+                
+                function seconds_to_clock(time_amount)
+                    local start_seconds = time_amount
+                    local start_minutes = math.modf(start_seconds/60)
+                    local seconds = start_seconds - start_minutes*60
+                    local start_hours = math.modf(start_minutes/60)
+                    local minutes = start_minutes - start_hours*60
+                    local start_days = math.modf(start_hours/24)
+                    local hours = start_hours - start_days*24
+                    local wrapped_time = {h=hours, m=minutes, s=seconds}
+                    return string.format('%02.f:%02.f:%02.f', wrapped_time.h, wrapped_time.m, wrapped_time.s)
+                end
+
                 function WeaponWidgetCreate()
                         if type(weapon) == 'table' and #weapon > 0 then
                             local WeaponPanaelIdList = {}
@@ -127,6 +141,9 @@
                             break end
                             newTargetCounter = newTargetCounter + 1
                             newTargetName = "["..radar.getConstructCoreSize(v).."]-"..getShortName(v).."- "..radar.getConstructName(v)
+                            if showTime then
+                                newTargetName = newTargetName..' - Time: '..seconds_to_clock(system.getTime())
+                            end
                             if radar.hasMatchingTransponder(v) == 1 then
                                 newTargetName = newTargetName.." - [Ally] Owner: "..getFriendlyDetails(v)
                             else
@@ -137,7 +154,9 @@
                                 system.print(system.getWaypointFromPlayerPos())
                             end
                         end
-                        newRadarContacts = {}     
+                        newRadarContacts = {}
+                    else
+                        newRadarContacts = {}
                     end
                 end
 

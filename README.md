@@ -8,7 +8,7 @@ Gunner Hud to provide useful information in 3rd person view
 	- Speed
 	- Distance
 - Radar with enemy and friendly filter
-	- 3 Letter easys Identification
+	- 3 Letter easy Identification
 	- 'Alt+C' to toggle Radar widget (Enemey/Friendly)
 - Info about shield status and CCS if shield is down/off
 - Detailed Info about allies (ships with same transponder tag) and Threats
