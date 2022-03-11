@@ -327,7 +327,7 @@
                                 allies[#allies+1]=id
                             end
                             if radar.getThreatFrom(id) ~= "none" then
-                                threats[#threats]=id
+                                threats[#threats+1]=id
                             end 
                             local ident = radar.isConstructIdentified(id) == 1
                             local randomid = getShortName(id)
