@@ -16,15 +16,18 @@ Gunner Hud to provide useful information in 3rd person view
 - Own Id, 3 Letter + ShipName displayed
 
 ## How to install:
-1. Download the 'SleimGunnerHUD.conf' file
-2. Place it in the DU custom folder inside the DU installation: 'Dual Universe\Game\data\lua\autoconf\custom'
+1. Download the 'SleimGunnerHUD.conf' and 'SleimRemoteHud.conf' file
+2. Place them in the DU custom folder inside the DU installation: 'Dual Universe\Game\data\lua\autoconf\custom'
 3. Ingame connect to Gunner Module:
 	- Space Radar
 	- Weapons
-	- (Optional) Shield generator
+	- (Optional and not recommended when using with the remote script) Shield generator
 	- (Optional and only after Space Radar!) Atmo Radar
-4. Only after download of new config:
+4. Make sure your ship has a shield and warp drive if you want to use the Remote script
+	- no manual connecting to remote needed
+5. Only after download of new config:
 	- Rightclick Gunner Module -> Advanced -> Update custom autoconf list
-5. Rightclick Gunner Module -> Advanced -> Run custom autoconfigure -> SleimGunneerHUD_v1.*
+6. Rightclick Gunner Module -> Advanced -> Run custom autoconfigure -> SleimGunneerHUD_v1.*
+7. Rightclick Remote Controller -> Advanced -> Run custom autoconfigure -> SleimRemoteHud
 
 
