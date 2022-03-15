@@ -609,14 +609,179 @@
                         healthHtml = shieldHealthBar
                     end
                 end
+
+                function drawDetailedDmg()
+                	local amHitCount = 0
+                	local elHitCount = 0
+                	local kiHitCount = 0
+                	local thHitCount = 0
+                	local errorCount = 0
+
+                	local amDmg = 0
+                	local elDmg = 0
+                	local kiDmg = 0
+                	local thDmg = 0
+                	local errorDmg = 0
+
+                	local amRawDmg = 0
+                	local elRawDmg = 0
+                	local kiRawDmg = 0
+                	local thRawDmg = 0
+                	local errorRawDmg = 0
+
+                	local totalDmg = 0
+                	local totalRawDmg = 0
+                	local talbeLenght = #hitTable
+
+                	for i=1,talbeLenght do
+                		local dmgType = hitTable[i][1]
+                		local rawDmg = hitTable[i][2]
+                		local dmgAfterRes = hitTable[i][3]
+
+                		totalRawDmg = totalRawDmg + rawDmg
+                		totalDmg = totalDmg + dmgAfterRes
+
+                		if dmgType == "AM" then
+                			amHitCount = amHitCount + 1
+                			amDmg = amDmg + dmgAfterRes
+                			amRawDmg = amRawDmg + rawDmg
+                		elseif dmgType == "EL" then
+                			elHitCount = elHitCount + 1
+                			elDmg = elDmg + dmgAfterRes
+                			elRawDmg = elRawDmg + rawDmg
+                		elseif dmgType == "KI" then
+                			kiHitCount = kiHitCount + 1
+                			kiDmg = kiDmg + dmgAfterRes
+                			kiRawDmg = kiRawDmg + rawDmg
+                		elseif dmgType == "TH" then
+                			thHitCount = thHitCount + 1
+                			thDmg = thDmg + dmgAfterRes
+                			thRawDmg = thRawDmg + rawDmg
+                		else
+                			errorCount = errorCount + 1
+                			errorDmg = errorDmg + dmgAfterRes
+                			errorRawDmg = errorRawDmg + rawDmg
+                		end
+                	end
+                	detailedDmgHtml=[[<style>
+				    table.detailedDmg {
+				        position: fixed;
+				        bottom: 50%;
+				        left: 10px;
+				        width: 200px;
+				        border-collapse: collapse;
+                        border-width: 2px;
+                        background: #142027;
+                        opacity: 0.8;
+                        font-family: "Lucida" Grande, sans-serif;
+                        font-size: 12px;
+                        border-radius: 5px;
+                        border: 0.2vh solid;
+                        border-color: #098dfe;
+				    }
+				    table.detailedDmg td {
+				    	border:solid;
+				    }
+				    .detailedDmgFillbar {
+				    	font-family: "Lucida" Grande, sans-serif;
+				        font-size: 10px;
+				        padding: 5px;
+				        border-radius: 5vh;
+				        height: 95%;
+				        position: left;
+				        text-align: left;
+				        background: red;
+				    }
+				    </style>
+				    <table class="detailedDmg">
+				    	<tr>
+				    		<td style="width:75px" rowspan=3>AM:</td>
+				    		<td style="width:75px">Count</td>
+				    		<td>
+				    			<div class = "detailedDmgFillbar" style="width:]]..(amHitCount/talbeLenght*100)..[[%"></div>
+				    		</td>
+				    	</tr>
+				    	<tr>
+				    		<td>Dmg</td>
+				    		<td><div class = "detailedDmgFillbar" style="width:]]..(amDmg/totalDmg*100)..[[%">]]..amHitCount..[[</div></td>
+				    	</tr>
+				    	<tr>
+				    		<td>Raw-Dmg</td>
+				    		<td><div class = "detailedDmgFillbar" style="width:]]..(amRawDmg/totalRawDmg*100)..[[%"></div></td>
+				    	</tr>
+
+
+				    	<tr>
+				    		<td rowspan=3>EL:</td>
+				    		<td>]]..elHitCount..[[</td>
+				    		<td><div class = "detailedDmgFillbar" style="width:]]..(elHitCount/talbeLenght*100)..[[%"></div></td>
+				    	</tr>
+				    	<tr>
+				    		<td>Dmg</td>
+				    		<td><div class = "detailedDmgFillbar" style="width:]]..(elDmg/totalDmg*100)..[[%"></div></td>
+				    	</tr>
+				    	<tr>
+				    		<td>Raw-Dmg</td>
+				    		<td><div class = "detailedDmgFillbar" style="width:]]..(elRawDmg/totalRawDmg*100)..[[%"></div></td>
+				    	</tr>
+
+
+
+				    	<tr>
+				    		<td rowspan=3>KI:</td>
+				    		<td>]]..kiHitCount..[[</td>
+				    		<td><div class = "detailedDmgFillbar" style="width:]]..(kiHitCount/talbeLenght*100)..[[%"></div><t/d>
+				    	</tr>
+				    	<tr>
+				    		<td>Dmg</td>
+				    		<td><div class = "detailedDmgFillbar" style="width:]]..(kiDmg/totalDmg*100)..[[%"></div></td>
+				    	</tr>
+				    	<tr>
+				    		<td>Raw-Dmg</td>
+				    		<td><div class = "detailedDmgFillbar" style="width:]]..(kiRawDmg/totalRawDmg*100)..[[%"></div></td>
+				    	</tr>
+
+
+				    	<tr>
+				    		<td rowspan=3>TH:</td>
+				    		<td>]]..thHitCount..[[</td>
+				    		<td><div class = "detailedDmgFillbar" style="width:]]..(thHitCount/talbeLenght*100)..[[%"></div></td>
+				    	</tr>
+				    	<tr>
+				    		<td>Dmg</td>
+				    		<td><div class = "detailedDmgFillbar" style="width:]]..(thDmg/totalDmg*100)..[[%"></div></td>
+				    	</tr>
+				    	<tr>
+				    		<td>Raw-Dmg</td>
+				    		<td><div class = "detailedDmgFillbar" style="width:]]..(thRawDmg/totalRawDmg*100)..[[%"></div></td>
+				    	</tr>
+
+				    	<tr>
+				    		<td rowspan=3>Unknown:</td>
+				    		<td>]]..errorCount..[[</td>
+				    		<td><div class = "detailedDmgFillbar" style="width:]]..(errorCount/talbeLenght*100)..[[%"></div></td>
+				    	</tr>
+				    	<tr>
+				    		<td>Dmg</td>
+				    		<td><div class = "detailedDmgFillbar" style="width:]]..(errorDmg/totalDmg*100)..[[%"></div></td>
+				    	</tr>
+				    	<tr>
+				    		<td>Raw-Dmg</td>
+				    		<td><div class = "detailedDmgFillbar" style="width:]]..(errorRawDmg/totalDmg*100)..[[%"></div></td>
+				    	</tr>
+				    </table>
+
+				    ]]
+                end
                 function combineHudElements()
+                	drawDetailedDmg() -- move to dps timer to check only every second
 				    drawFuelInfo()
 				    brakeHud()
 				    speedInfo()
 				    drawPipeInfo()
 				    drawEnemyDPS()
 				    drawShield()
-				    system.setScreen(fuelHtml..brakeHtml..speedHtml..pipeInfoHtml..enemyDPSHtml..healthHtml)
+				    system.setScreen(fuelHtml..brakeHtml..speedHtml..pipeInfoHtml..enemyDPSHtml..healthHtml..detailedDmgHtml)
 				end
 				unit.setTimer("dps",1)
 				unit.setTimer("hud",0.1)
