@@ -629,14 +629,15 @@
                 	local thRawDmg = 0
                 	local errorRawDmg = 0
 
+
                 	local totalDmg = 0
                 	local totalRawDmg = 0
                 	local talbeLenght = #hitTable
 
                 	for i=1,talbeLenght do
                 		local dmgType = hitTable[i][1]
-                		local rawDmg = hitTable[i][2]
-                		local dmgAfterRes = hitTable[i][3]
+                		local dmgAfterRes = hitTable[i][2]
+                		local rawDmg = hitTable[i][3]
 
                 		totalRawDmg = totalRawDmg + rawDmg
                 		totalDmg = totalDmg + dmgAfterRes
@@ -663,6 +664,28 @@
                 			errorRawDmg = errorRawDmg + rawDmg
                 		end
                 	end
+                	local dmgTable = {amDmg,elDmg,kiDmg,thDmg,errorDmg,amRawDmg,elRawDmg,kiRawDmg,thRawDmg,errorRawDmg}
+                	local top = table.sort( dmgTable)[#dpmTable]
+                	function addDmgRow(dmgType,hitCount,d,rD)
+                	return [[<tr>
+				    		<td style="width:75px" rowspan=3>]]..dmgType..[[:</td>
+				    		<td style="width:75px">Count</td>
+				    		<td>
+				    			<div class = "detailedDmgFillbar" style="width:]]..(hitCount/talbeLenght*100)..[[%"></div>
+				    		</td>
+				    	</tr>
+				    	<tr>
+				    		<td>Dmg</td>
+				    		<td><div class = "detailedDmgFillbar" style="width:]]..(d/top*100)..[[%"></div></td>
+				    	</tr>
+				    	<tr>
+				    		<td>Raw-Dmg</td>
+				    		<td><div class = "detailedDmgFillbar" style="width:]]..(rD/top*100)..[[%"></div></td>
+				    	</tr>]]
+
+
+                	end
+
                 	detailedDmgHtml=[[<style>
 				    table.detailedDmg {
 				        position: fixed;
@@ -693,82 +716,12 @@
 				        background: red;
 				    }
 				    </style>
-				    <table class="detailedDmg">
-				    	<tr>
-				    		<td style="width:75px" rowspan=3>AM:</td>
-				    		<td style="width:75px">Count</td>
-				    		<td>
-				    			<div class = "detailedDmgFillbar" style="width:]]..(amHitCount/talbeLenght*100)..[[%"></div>
-				    		</td>
-				    	</tr>
-				    	<tr>
-				    		<td>Dmg</td>
-				    		<td><div class = "detailedDmgFillbar" style="width:]]..(amDmg/totalDmg*100)..[[%">]]..amHitCount..[[</div></td>
-				    	</tr>
-				    	<tr>
-				    		<td>Raw-Dmg</td>
-				    		<td><div class = "detailedDmgFillbar" style="width:]]..(amRawDmg/totalRawDmg*100)..[[%"></div></td>
-				    	</tr>
-
-
-				    	<tr>
-				    		<td rowspan=3>EL:</td>
-				    		<td>]]..elHitCount..[[</td>
-				    		<td><div class = "detailedDmgFillbar" style="width:]]..(elHitCount/talbeLenght*100)..[[%"></div></td>
-				    	</tr>
-				    	<tr>
-				    		<td>Dmg</td>
-				    		<td><div class = "detailedDmgFillbar" style="width:]]..(elDmg/totalDmg*100)..[[%"></div></td>
-				    	</tr>
-				    	<tr>
-				    		<td>Raw-Dmg</td>
-				    		<td><div class = "detailedDmgFillbar" style="width:]]..(elRawDmg/totalRawDmg*100)..[[%"></div></td>
-				    	</tr>
-
-
-
-				    	<tr>
-				    		<td rowspan=3>KI:</td>
-				    		<td>]]..kiHitCount..[[</td>
-				    		<td><div class = "detailedDmgFillbar" style="width:]]..(kiHitCount/talbeLenght*100)..[[%"></div><t/d>
-				    	</tr>
-				    	<tr>
-				    		<td>Dmg</td>
-				    		<td><div class = "detailedDmgFillbar" style="width:]]..(kiDmg/totalDmg*100)..[[%"></div></td>
-				    	</tr>
-				    	<tr>
-				    		<td>Raw-Dmg</td>
-				    		<td><div class = "detailedDmgFillbar" style="width:]]..(kiRawDmg/totalRawDmg*100)..[[%"></div></td>
-				    	</tr>
-
-
-				    	<tr>
-				    		<td rowspan=3>TH:</td>
-				    		<td>]]..thHitCount..[[</td>
-				    		<td><div class = "detailedDmgFillbar" style="width:]]..(thHitCount/talbeLenght*100)..[[%"></div></td>
-				    	</tr>
-				    	<tr>
-				    		<td>Dmg</td>
-				    		<td><div class = "detailedDmgFillbar" style="width:]]..(thDmg/totalDmg*100)..[[%"></div></td>
-				    	</tr>
-				    	<tr>
-				    		<td>Raw-Dmg</td>
-				    		<td><div class = "detailedDmgFillbar" style="width:]]..(thRawDmg/totalRawDmg*100)..[[%"></div></td>
-				    	</tr>
-
-				    	<tr>
-				    		<td rowspan=3>Unknown:</td>
-				    		<td>]]..errorCount..[[</td>
-				    		<td><div class = "detailedDmgFillbar" style="width:]]..(errorCount/talbeLenght*100)..[[%"></div></td>
-				    	</tr>
-				    	<tr>
-				    		<td>Dmg</td>
-				    		<td><div class = "detailedDmgFillbar" style="width:]]..(errorDmg/totalDmg*100)..[[%"></div></td>
-				    	</tr>
-				    	<tr>
-				    		<td>Raw-Dmg</td>
-				    		<td><div class = "detailedDmgFillbar" style="width:]]..(errorRawDmg/totalDmg*100)..[[%"></div></td>
-				    	</tr>
+				    <table class="detailedDmg">]]..addDmgRow("AM",amHitCount,amDmg,amRawDmg)..
+				    addDmgRow("EL",elHitCount,elDmg,elRawDmg)..
+				    addDmgRow("KI",kiHitCount,kiDmg,kiRawDmg)..
+				    addDmgRow("TH",thHitCount,thDmg,thRawDmg)..
+				    addDmgRow("Unknown:",errorCount,errorDmg,errorRawDmg)..[[
+				    
 				    </table>
 
 				    ]]

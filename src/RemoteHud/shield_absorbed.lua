@@ -22,26 +22,47 @@ local elDmg = 0
 local kiDmg = 0
 local thDmg = 0
 
-if amS > prevAmS or amSRaw > prevAmSRaw or amS == 1 or amDmg == rawHitpoints then
+if amS > prevAmS or amSRaw > prevAmSRaw or amS == 1 then
 	hitTable[hitcount]={"AM",hitpoints,rawHitpoints}
-	amDmg = rawHitpoints
+	amDmg = hitpoints
 	system.print("Antimatter")
-elseif elS > prevElS or elSRaw > prevElSRaw or elS == 1 or elDmg == rawHitpoints then
+elseif elS > prevElS or elSRaw > prevElSRaw or elS == 1 then
 	hitTable[hitcount]={"EL",hitpoints,rawHitpoints}
-	elDmg = rawHitpoints
+	elDmg = hitpoints
 	system.print("Electro")
-elseif kiS > prevKiS or kiSRaw > prevKiSRaw or kiS == 1 or kiDmg == rawHitpoints then
+elseif kiS > prevKiS or kiSRaw > prevKiSRaw or kiS == 1 then
 	hitTable[hitcount]={"KI",hitpoints,rawHitpoints}
-	kiDmg = rawHitpoints
+	kiDmg = hitpoints
 	system.print("Kinetic")
-elseif thS > prevThS or thSRaw > prevElSRaw or thS == 1 or thmDmg == rawHitpoints then
+elseif thS > prevThS or thSRaw > prevElSRaw or thS == 1 then
 	hitTable[hitcount]={"TH",hitpoints,rawHitpoints}
-	thmDmg = rawHitpoints
+	thmDmg = hitpoints
 	system.print("Thermic")
 else
-	hitTable[hitcount]={"Error",hitpoints,rawHitpoints}
-	system.print("Error: "..errorType)
+	if noDoubles() then
+		if amDmg == hitpoints then
+			hitTable[hitcount]={"AM",hitpoints,rawHitpoints}
+			amDmg = hitpoints
+			system.print("Antimatter")
+		elseif elDmg == hitpoints then
+			hitTable[hitcount]={"EL",hitpoints,rawHitpoints}
+			elDmg = hitpoints
+			system.print("Electro")
+		elseif kiDmg == hitpoints then
+			hitTable[hitcount]={"KI",hitpoints,rawHitpoints}
+			kiDmg = hitpoints
+			system.print("Kinetic")
+		elseif thmDmg == hitpoints then
+			hitTable[hitcount]={"TH",hitpoints,rawHitpoints}
+			thmDmg = hitpoints
+			system.print("Thermic")
+		end
+	else
+		hitTable[hitcount]={"Error",hitpoints,rawHitpoints}
+		system.print("Error")
+	end
 end
+
 if hitcount < 30 then
 	hitcount = hitcount + 1
 else
@@ -56,3 +77,17 @@ prevAmSRaw = amSRaw
 prevElSRaw = elSRaw
 prevKiSRaw = kiSRaw
 prevThSRaw = thSRaw
+
+function noDoubles()
+	local values = {amDmg,elDmg,kiDmg,thDmg}
+	for i=1,4 do
+		for k=1,4 do
+			if i~=k then
+				if values[i]==values[k] and values[k] ~= 0 and values[i] ~= 0 then
+					return false
+				end
+			end
+		end
+	end
+	return true
+end
