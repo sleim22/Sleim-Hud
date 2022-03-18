@@ -17,6 +17,11 @@ local elS = currentStress[2]
 local kiS = currentStress[3]
 local thS = currentStress[4]
 
+system.print("AM Stress:"..amS-prevAmS.." | "..amSRaw-prevAmSRaw)
+system.print("EL Stress:"..elS-prevElS.." | "..elSRaw-prevElSRaw)
+system.print("KI Stress:"..kiS-prevKiS.." | "..kiSRaw-prevKiSRaw)
+system.print("TH Stress:"..thS-prevThS.." | "..thSRaw-prevThSRaw)
+
 local amDmg = 0
 local elDmg = 0
 local kiDmg = 0
@@ -43,19 +48,19 @@ else
 		if amDmg == hitpoints then
 			hitTable[hitcount]={"AM",hitpoints,rawHitpoints}
 			amDmg = hitpoints
-			system.print("Antimatter")
+			system.print("E-Antimatter")
 		elseif elDmg == hitpoints then
 			hitTable[hitcount]={"EL",hitpoints,rawHitpoints}
 			elDmg = hitpoints
-			system.print("Electro")
+			system.print("E-Electro")
 		elseif kiDmg == hitpoints then
 			hitTable[hitcount]={"KI",hitpoints,rawHitpoints}
 			kiDmg = hitpoints
-			system.print("Kinetic")
+			system.print("E-Kinetic")
 		elseif thmDmg == hitpoints then
 			hitTable[hitcount]={"TH",hitpoints,rawHitpoints}
 			thmDmg = hitpoints
-			system.print("Thermic")
+			system.print("E-Thermic")
 		end
 	else
 		hitTable[hitcount]={"Error",hitpoints,rawHitpoints}
@@ -82,8 +87,9 @@ function noDoubles()
 	local values = {amDmg,elDmg,kiDmg,thDmg}
 	for i=1,4 do
 		for k=1,4 do
-			if i~=k then
-				if values[i]==values[k] and values[k] ~= 0 and values[i] ~= 0 then
+			if i~=k and values[k] ~= 0 and values[i] ~= 0 then
+				system.print(i..": "..values[i].." - "..k..": "..values[k])
+				if values[i]==values[k] then
 					return false
 				end
 			end

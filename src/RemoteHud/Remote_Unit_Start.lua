@@ -666,7 +666,24 @@
                 	end
                 	local dmgTable = {amDmg,elDmg,kiDmg,thDmg,errorDmg,amRawDmg,elRawDmg,kiRawDmg,thRawDmg,errorRawDmg}
                 	local top = table.sort( dmgTable)[#dpmTable]
+
                 	function addDmgRow(dmgType,hitCount,d,rD)
+                		if d > 1000000 then
+	                         dString = string.format('%0.3f',(d/1000000)).."M"
+	                    elseif d > 1000 then
+	                         dString = string.format('%0.2f',(d/1000)).."k"   
+	                    else
+	                    	dString = d 
+	                    end
+
+	                    if rD > 1000000 then
+	                         rDString = string.format('%0.3f',(rD/1000000)).."M"
+	                    elseif rD > 1000 then
+	                         rDString = string.format('%0.2f',(rD/1000)).."k"   
+	                    else
+	                    	rDString = rD
+	                    end
+
                 	return [[<tr>
 				    		<td style="width:75px" rowspan=3>]]..dmgType..[[:</td>
 				    		<td style="width:75px">Count</td>
