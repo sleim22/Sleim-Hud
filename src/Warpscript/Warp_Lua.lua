@@ -75,7 +75,7 @@
                     local coord = vec3(coordinates)
                     for i, v in pairs(atlas[0]) do
                         local distance2 = (vec3(v.center) - coord):len2()
-                        if (not body or distance2 < minDistance2) then -- Never return space.  
+                        if v.type[1]=="Planet" and (not body or distance2 < minDistance2) then -- Never return space.  
                             body = v
                             minDistance2 = distance2
                         end
@@ -110,23 +110,79 @@
                     nearestDistance = nil
                     local nearestPipePlanet = nil
                     local pipeOriginPlanet = nil
-                    local originPlanet = getCurrentBody()
+                    local originPlanet = getCurrentBody(false)
 
                     for k,nextPlanet in pairs(atlas[0]) do
-                    	for i,originPlanet in pairs(atlas[0]) do
-                    		if i~=k then
-		                        local distance = getPipeDistance(vec3(originPlanet.center), vec3(nextPlanet.center),wp)
-		                        if (nearestDistance == nil or distance < nearestDistance) then
-		                            nearestPipePlanet = nextPlanet
-		                            nearestDistance = distance
-		                            pipeOriginPlanet = originPlanet
-		                        end
-		                    end
-		                end
+                        local distance = getPipeDistance(vec3(originPlanet.center), vec3(nextPlanet.center),wp)
+                        if nextPlanet.type[1]=="Planet" and (nearestDistance == nil or distance < nearestDistance) and distance < 500*200000 then
+                            nearestPipePlanet = nextPlanet
+                            nearestDistance = distance
+                            pipeOriginPlanet = originPlanet
+                        end
                     end
                     pipeDistance = getDistanceDisplayString(nearestDistance)
                     return pipeOriginPlanet.name[1],nearestPipePlanet.name[1],pipeDistance
                 end
+                
+                function getClosestPipePrecise(wp)
+                    local pipeDistance
+                    nearestDistance = nil
+                    local nearestPipePlanet = nil
+                    local pipeOriginPlanet = nil
+                    local originPlanet = getCurrentBody()
+
+                    for k,nextPlanet in pairs(atlas[0]) do
+                    	if nextPlanet.type[1]=="Planet" then 
+	                    	for i,originPlanet in pairs(atlas[0]) do
+	                    		if i~=k and originPlanet.type[1]=="Planet" then
+			                        local distance = getPipeDistance(vec3(originPlanet.center), vec3(nextPlanet.center),wp)
+			                        if (nearestDistance == nil or distance < nearestDistance) then
+			                            nearestPipePlanet = nextPlanet
+			                            nearestDistance = distance
+			                            pipeOriginPlanet = originPlanet
+			                        end
+			                    end
+			                end
+			            end
+                    end
+                    pipeDistance = getDistanceDisplayString(nearestDistance)
+                    return pipeOriginPlanet.name[1],nearestPipePlanet.name[1],pipeDistance
+                end
+
+                function planetList()
+                	planetList = {}
+                	for k,nextPlanet in pairs(atlas[0]) do
+                    	if nextPlanet.type[1]=="Planet" then
+                    		planetList[#planetList+1]=nextPlanet
+                    		--system.print(nextPlanet.name[1])
+                    	end
+                    end
+                end
+
+                function newGetClosestPipe(wp)
+                	local pipeDistance
+                    nearestDistance = nil
+                    local nearestPipePlanet = nil
+                    local pipeOriginPlanet = nil
+
+					for i=1,#planetList,1 do
+	                	for k=#planetList,i,-1 do
+	                		originPlanet = planetList[i]
+	                		nextPlanet = planetList[k]
+	                		local distance = getPipeDistance(vec3(originPlanet.center), vec3(nextPlanet.center),wp)
+	                        if (nearestDistance == nil or distance < nearestDistance) then
+	                            nearestPipePlanet = nextPlanet
+	                            nearestDistance = distance
+	                            pipeOriginPlanet = originPlanet
+	                        end
+	                		--system.print(planetList[i].name[1].."-"..planetList[k].name[1])
+	                	end
+	                end
+	                pipeDistance = getDistanceDisplayString(nearestDistance)
+                    return pipeOriginPlanet.name[1],nearestPipePlanet.name[1],pipeDistance
+                end
+
+
 
                 function getPipeDistance(origCenter, destCenter,pos) 
                     local pipeDistance
@@ -147,15 +203,18 @@
                     end        
                 end
 
-                function updatePipeInfo()
+                function updatePipeInfo(precise)
                     currentPos = core.getConstructWorldPos()
                     local notPvPZone, pvpDist = safeZone(currentPos)
                     local o,p,d = getClosestPipe(currentPos)
+                    if precise then
+                    	o,p,d = getClosestPipePrecise(currentPos)
+                    end
                     return o,p,d,notPvPZone,pvpDist
                 end
                 function drawPipeInfo()
                                     local zone = ""
-                                    local originPlanet,pipePlanet,pipeDist,notPvPZone,pvpDist=updatePipeInfo()
+                                    local originPlanet,pipePlanet,pipeDist,notPvPZone,pvpDist=updatePipeInfo(false)
                                     if notPvPZone then
                                         zone = "PvP"
                                     else
@@ -397,10 +456,11 @@
 	                        radar = radar_1
 	                    end
                     end
-                    local originPlanet,pipePlanet,pipeDist,notPvPZone,pvpDist=updatePipeInfo()
+                    local originPlanet,pipePlanet,pipeDist,notPvPZone,pvpDist=updatePipeInfo(true)
+                    local d = pvpDist
                     pvpDist = getDistanceDisplayString(pvpDist)
 
-                    if not notPvPZone or printSZContacts then
+                    if (not notPvPZone or printSZContacts) and d > 3*200000 then
                         local newTargetCounter = 0
                         for k,v in pairs(newRadarContacts) do
                             if newTargetCounter > 10 then
