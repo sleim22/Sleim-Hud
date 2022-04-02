@@ -396,6 +396,7 @@
 				        ttZ = 0
 				        ttZString = "Calculating"
 				        calculating = false
+				        diff = 0
 				    end
 				end
 
