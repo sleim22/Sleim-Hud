@@ -480,7 +480,7 @@
                             end
                             system.print("New Target: "..newTargetName)
                             if printLocationOnContact then
-                                system.print(originPlanet.." - "..pipePlanet.." PvP-Border in "..pvpDist)
+                                system.print(originPlanet.." - "..pipePlanet.." PvP-Border in "..pvpDist.." to "..getCurrentBody().name[1])
                                 system.print(system.getWaypointFromPlayerPos())
                             end
                             if screen_1 ~= nil then
