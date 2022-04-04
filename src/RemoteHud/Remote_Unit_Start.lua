@@ -61,13 +61,13 @@
 				end
 
 
-				function getCurrentBody()
+				function getCurrentBody(withMoons)
 				    local coordinates = core.getConstructWorldPos()
 				    local minDistance2, body
 				    local coord = vec3(coordinates)
 				    for i, v in pairs(atlas[0]) do
 				        local distance2 = (vec3(v.center) - coord):len2()
-				        if (not body or distance2 < minDistance2) then -- Never return space.  
+				        if (withMoons or nextPlanet.type[1]=="Planet") and (not body or distance2 < minDistance2) then -- Never return space.  
 				            body = v
 				            minDistance2 = distance2
 				        end
@@ -80,7 +80,7 @@
 				    local safeWorldPos = vec3({13771471,7435803,-128971})
 				    local safeRadius = 18000000
 				    local szradius = 500000
-				    local currentBody = getCurrentBody()
+				    local currentBody = getCurrentBody(true)
 				    local distsz, distp = math.huge
 				     local mabs = math.abs
 				    local szsafe 
@@ -102,11 +102,11 @@
 				    nearestDistance = nil
 				    local nearestPipePlanet = nil
 				    local pipeOriginPlanet = nil
-				    local originPlanet = getCurrentBody()
+				    local originPlanet = getCurrentBody(false)
 
 				    for k,nextPlanet in pairs(atlas[0]) do
 				        local distance = getPipeDistance(vec3(originPlanet.center), vec3(nextPlanet.center),wp)
-				        if (nearestDistance == nil or distance < nearestDistance) then
+				        if nextPlanet.type[1]=="Planet" and (nearestDistance == nil or distance < nearestDistance) then
 				            nearestPipePlanet = nextPlanet
 				            nearestDistance = distance
 				            pipeOriginPlanet = originPlanet
@@ -396,6 +396,7 @@
 				        ttZ = 0
 				        ttZString = "Calculating"
 				        calculating = false
+				        diff = 0
 				    end
 				end
 
