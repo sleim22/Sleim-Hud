@@ -146,8 +146,10 @@
                             end
                             if radar.hasMatchingTransponder(v) == 1 then
                                 newTargetName = newTargetName.." - [Ally] Owner: "..getFriendlyDetails(v)
+                                lastFriendly= true
                             else
                                 system.playSound("contact.mp3")
+                                lastEnemy = true
                             end
                             system.print("New Target: "..newTargetName)
                             if printLocationOnContact then
@@ -518,8 +520,30 @@
                 if showAllies then
                     drawAlliesHtml()
                 end
+                alarmStyles = [[
+                    <style>
+                   .bloodAlarm {
+                    width:100%;
+                    height:100%;
+                    box-shadow: 0 0 0px 0px red inset;
+                    }
+                    .friendlyAlarm{
+                        width:100%;
+                        height:100%;
+                        box-shadow: 0 0 0px 0px green inset;
+                    }
+                </style>
+                ]]
+                lastFriendly,lastEnemy = false;
                 function drawHud()
-                    html = cssAllyLocked..healthHtml..alliesHtml..threatsHtml..ownInfoHtml
+                    if lastEnemy then
+                        html = "<html class='bloodAlarm'></html>"
+                    elseif lastFriendly then
+                        html = "<html class='friendlyAlarm'></html>"
+                    else
+                        html = "<html class=''></html>"
+                    end
+                    html = html..alarmStyles..cssAllyLocked..healthHtml..alliesHtml..threatsHtml..ownInfoHtml
                     system.setScreen(html)
                 end
                 radar = radar_1
@@ -531,3 +555,4 @@
                 unit.setTimer("data", 0.2)
                 unit.setTimer("radar", 0.4)
                 unit.setTimer("clean", 30)
+                unit.setTimer("cleanBorder",1)
