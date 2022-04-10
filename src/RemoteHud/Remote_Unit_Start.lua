@@ -270,7 +270,7 @@
 									local speed = math.floor(vec3(core.getWorldVelocity()):len() * 3.6)
 									local accel = math.floor((json.decode(unit.getData()).acceleration/9.80665)*10)/10
 
-				                    local c = 8333.333
+				                    local c = 8333.33
 				                    local m0 = core.getConstructMass()
 				                    local v0 = vec3(core.getWorldVelocity())
 				                    local controllerData = json.decode(unit.getData())
