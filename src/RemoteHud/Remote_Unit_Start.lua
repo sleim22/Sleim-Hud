@@ -270,27 +270,17 @@
 									local speed = math.floor(vec3(core.getWorldVelocity()):len() * 3.6)
 									local accel = math.floor((json.decode(unit.getData()).acceleration/9.80665)*10)/10
 
-				                    local c = 8333.33
-				                    local m0 = core.getConstructMass()
+				                    --local c = 8333.33
+				                    local m = core.getConstructMass()
 				                    local v0 = vec3(core.getWorldVelocity())
 				                    local controllerData = json.decode(unit.getData())
 				                    local maxBrakeThrust = controllerData.maxBrake
 				                    local time = 0.0
 				                    dis = 0.0
 				                    local v = v0:len()
-				                    while v>1.0 do
-				                      time = time + 1
-				                      local m = m0 / (math.sqrt(1 - (v * v) / (c * c)))
-				                      local a = maxBrakeThrust / m
-				                      if v > a then
-				                        v = v - a --*1 sec
-				                        dis = dis + v + a / 2.0
-				                      elseif a ~= 0 then
-				                        local t = v/a
-				                        dis = dis + v * t + a*t*t/2
-				                        v = v - a
-				                      end
-				                    end
+				                   	local a = maxBrakeThrust / m
+				                    time = v / a
+				                    dis = v * time + 0.5*a*time*time
 				                    local resString = ""
 				                    if dis > 100000 then
 				                      resString = resString..string.format(math.floor((dis/200000) * 10)/10)
