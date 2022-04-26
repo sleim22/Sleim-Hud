@@ -268,6 +268,7 @@
 				function speedInfo()
 									local throttle = math.floor(unit.getThrottle())
 									local speed = math.floor(vec3(core.getWorldVelocity()):len() * 3.6)
+									local maxSpeed = math.floor(core.getMaxSpeed()*3.6)
 									local accel = math.floor((json.decode(unit.getData()).acceleration/9.80665)*10)/10
 
 				                    --local c = 8333.33
@@ -280,7 +281,7 @@
 				                    local v = v0:len()
 				                   	local a = maxBrakeThrust / m
 				                    time = v / a
-				                    dis = v * time + 0.5*a*time*time
+				                    dis = v * time + 1/2*a*time*time
 				                    local resString = ""
 				                    if dis > 100000 then
 				                      resString = resString..string.format(math.floor((dis/200000) * 10)/10)
@@ -295,7 +296,7 @@
 
 									speedHtml = [[
 										<style>
-		                                    h1{
+		                                    h1,h6{
 		                                    color: #80ffff;
 											}
 										table.speed{
@@ -313,19 +314,20 @@
 											<table class="speed">
 												<tr>
 													<td style="text-align: right;"><h1>]]..throttle..[[</h1></td>
-													<td>%</td>
+													<td colspan="2">%</td>
 												</tr>
 												<tr>
 													<td style="text-align: right;"><h1>]]..speed..[[</h1></td>
 													<td>km/h</td>
+													<td><h6>(]]..maxSpeed..[[ km/h)</h6>
 												</tr>
 												<tr>
 													<td style="text-align: right;"><h1>]]..accel..[[</h1></td>
-													<td>g</td>
+													<td colspan="2">g</td>
 												</tr>
 												<tr>
 													<td style="text-align: right;"><h1>]]..resString..[[</h1></td>
-													<td>]]..brakeText..[[ Brake-Dist</td>
+													<td colspan="2">]]..brakeText..[[ Brake-Dist</td>
 												</tr>
 											</table>
 

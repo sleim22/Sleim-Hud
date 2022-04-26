@@ -142,7 +142,7 @@
                             newTargetCounter = newTargetCounter + 1
                             newTargetName = "["..radar.getConstructCoreSize(v).."]-"..getShortName(v).."- "..radar.getConstructName(v)
                             if showTime then
-                                newTargetName = newTargetName..' - Time: '..seconds_to_clock(system.getTime())
+                                newTargetName = newTargetName..' - Time: '..seconds_to_clock(system.getArkTime())
                             end
                             if radar.hasMatchingTransponder(v) == 1 then
                                 newTargetName = newTargetName.." - [Ally] Owner: "..getFriendlyDetails(v)
