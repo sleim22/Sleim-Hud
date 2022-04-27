@@ -147,16 +147,18 @@
                             if radar.hasMatchingTransponder(v) == 1 then
                                 newTargetName = newTargetName.." - [Ally] Owner: "..getFriendlyDetails(v)
                                 if not borderActive then
-                                    greenBorder = true
+                                    borderColor = "green"
+                                    borderWidth = 200
                                     borderActive = true
-                                    unit.setTimer("greenBorder",0.5)
+                                    unit.setTimer("cleanBorder",1)
                                 end
                             else
                                 system.playSound("contact.mp3")
                                 if not borderActive then
-                                    redBorder = true
                                     borderActive = true
-                                    unit.setTimer("redBorder",0.5)
+                                    borderColor = "red"
+                                    borderWidth = 200
+                                    unit.setTimer("cleanBorder",1)
                                 end
                             end
                             system.print("New Target: "..newTargetName)
