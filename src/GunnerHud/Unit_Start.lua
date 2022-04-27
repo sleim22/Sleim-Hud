@@ -142,14 +142,22 @@
                             newTargetCounter = newTargetCounter + 1
                             newTargetName = "["..radar.getConstructCoreSize(v).."]-"..getShortName(v).."- "..radar.getConstructName(v)
                             if showTime then
-                                newTargetName = newTargetName..' - Time: '..seconds_to_clock(system.getTime())
+                                newTargetName = newTargetName..' - Time: '..seconds_to_clock(system.getArkTime())
                             end
                             if radar.hasMatchingTransponder(v) == 1 then
                                 newTargetName = newTargetName.." - [Ally] Owner: "..getFriendlyDetails(v)
-                                lastFriendly= true
+                                if not borderActive then
+                                    greenBorder = true
+                                    borderActive = true
+                                    unit.setTimer("greenBorder",0.5)
+                                end
                             else
                                 system.playSound("contact.mp3")
-                                lastEnemy = true
+                                if not borderActive then
+                                    redBorder = true
+                                    borderActive = true
+                                    unit.setTimer("redBorder",0.5)
+                                end
                             end
                             system.print("New Target: "..newTargetName)
                             if printLocationOnContact then
@@ -520,30 +528,24 @@
                 if showAllies then
                     drawAlliesHtml()
                 end
-                alarmStyles = [[
-                    <style>
-                   .bloodAlarm {
+                borderWidth = 0
+                borderColor = "red"
+                redBorder = false
+                greenBorder = false
+                borderActive = false
+                function alarmBorder()
+                    alarmStyles = [[<style>
+                   .alarmBorder {
                     width:100%;
                     height:100%;
-                    box-shadow: 0 0 0px 0px red inset;
-                    }
-                    .friendlyAlarm{
-                        width:100%;
-                        height:100%;
-                        box-shadow: 0 0 0px 0px green inset;
-                    }
-                </style>
-                ]]
-                lastFriendly,lastEnemy = false;
+                    box-shadow: 0 0 ]]..borderWidth..[[px 0px ]]..borderColor..[[ inset;
+                    }</style>
+                    <html class='alarmBorder'></html>]]
+                end
+                
                 function drawHud()
-                    if lastEnemy then
-                        html = "<html class='bloodAlarm'></html>"
-                    elseif lastFriendly then
-                        html = "<html class='friendlyAlarm'></html>"
-                    else
-                        html = "<html class=''></html>"
-                    end
-                    html = html..alarmStyles..cssAllyLocked..healthHtml..alliesHtml..threatsHtml..ownInfoHtml
+                    
+                    html = alarmStyles..cssAllyLocked..healthHtml..alliesHtml..threatsHtml..ownInfoHtml
                     system.setScreen(html)
                 end
                 radar = radar_1
