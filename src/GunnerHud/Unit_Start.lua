@@ -72,7 +72,7 @@
                     local c = (b*653276)%8388593
                     return kCharSet[a%kCharSetSize+1] .. kCharSet[b%kCharSetSize+1] .. kCharSet[c%kCharSetSize+1]
                 end
-                
+
                 function seconds_to_clock(time_amount)
                     local start_seconds = time_amount
                     local start_minutes = math.modf(start_seconds/60)
@@ -84,6 +84,23 @@
                     local wrapped_time = {h=hours, m=minutes, s=seconds}
                     return string.format('%02.f:%02.f:%02.f', wrapped_time.h, wrapped_time.m, wrapped_time.s)
                 end
+                function createWeaponData(weapon)
+                    local data = weapon.getData()
+                    local dataObject = json.decode(data)
+                    dataObject["properties"]["ammoName"] = "Thermic"
+                    system.print(dataObject["properties"]["ammoName"])
+                    return json.encode(dataObject)
+                end
+
+
+
+
+
+                local panel = system.createWidgetPanel('test')
+                local widget = system.createWidget(panel,'weapon')
+                local widgetData = system.createData(createWeaponData(weapon_1))
+                system.addDataToWidget(widgetData,widget)
+
 
                 function WeaponWidgetCreate()
                         if type(weapon) == 'table' and #weapon > 0 then
@@ -98,7 +115,7 @@
                             end
                     end
                 end
-                if showWeapons == true then 
+                if showWeapons == true then
                    WeaponWidgetCreate()
                 end
 
@@ -174,7 +191,7 @@
 
                 function updateTargetWidget()
                     targetId = radar.getTargetId()
-                    if targetId == 0 then 
+                    if targetId == 0 then
                         targetName = "No Target selected"
                         targetDistance = 0
                         speedChangeIcon = ""
@@ -191,7 +208,7 @@
                         else
                             speedChangeIcon = ""
                         end
-                    
+
                         if targetDistance > oldTargetDistance then
                             distanceChangeIcon = "↑"
                         elseif targetDistance < oldTargetDistance then
@@ -203,7 +220,7 @@
                         oldSpeed = targetSpeed
                     end
                     if targetDistance < 1000 then
-                        distanceUnit= "m" 
+                        distanceUnit= "m"
                     elseif targetDistance < 100000 then
                         targetDistance = targetDistance/1000
                         distanceUnit = "km"
@@ -223,7 +240,7 @@
                     if maxCoreStress > 1000000 then
                          maxCoreStress = string.format('%0.3f',(maxCoreStress/1000000)).."M"
                     elseif maxCoreStress > 1000 then
-                         maxCoreStress = string.format('%0.2f',(maxCoreStress/1000)).."k"    
+                         maxCoreStress = string.format('%0.2f',(maxCoreStress/1000)).."k"
                     end
                     system.print("Max Core Stress: "..maxCoreStress)
                 end
@@ -234,14 +251,14 @@
                     if shieldPercent == 100 then shieldPercent = "100"
                     else
                     shieldPercent = string.format('%0.2f',shieldPercent)
-                    end    
+                    end
                     coreStressPercent = string.format('%0.2f',core.getCoreStressRatio()*100)
                     local shieldHealthBar= [[
                     <style>
                     .health-bar {
                         position: fixed;
-                        width: 13em; 
-                        padding: 1vh; 
+                        width: 13em;
+                        padding: 1vh;
                         bottom: 5vh;
                         left: 50%;
                         transform: translateX(-50%);
@@ -277,8 +294,8 @@
                     <style>
                     .stress-health-bar {
                         position: fixed;
-                        width: 13em; 
-                        padding: 1vh; 
+                        width: 13em;
+                        padding: 1vh;
                         bottom:]]..stressBarHeight..[[vh;
                         left: 50%;
                         transform: translateX(-50%);
@@ -296,7 +313,7 @@
                         padding: 5px;
                         border-radius: 5vh;
                         background: #ff0000;
-                        opacity: 0.8;  
+                        opacity: 0.8;
                         width: ]]..coreStressPercent..[[%;
                         height: 40px;
                         position: relative;
@@ -316,7 +333,7 @@
                         healthHtml = coreStressBar..shieldHealthBar
                     elseif shield_1.getState() == 0 or shield_1.getShieldHitpoints() == 0 then
                         stressBarHeight = "5"
-                        healthHtml = coreStressBar 
+                        healthHtml = coreStressBar
                     else
                         stressBarHeight = "5"
                         venting = ""
@@ -329,8 +346,8 @@
                     allies={}
                     threats={}
                     local data = radar.getData()
-                    if string.len(data) < 120000 then  
-                        local constructList = data:gmatch('({"constructId":".-%b{}.-})') 
+                    if string.len(data) < 120000 then
+                        local constructList = data:gmatch('({"constructId":".-%b{}.-})')
                         local list = {}
                         for str in constructList do
                             local id = tonumber(str:match('"constructId":"([%d]*)"'))
@@ -340,7 +357,7 @@
                             end
                             if radar.getThreatFrom(id) ~= "none" then
                                 threats[#threats+1]=id
-                            end 
+                            end
                             local ident = radar.isConstructIdentified(id) == 1
                             local randomid = getShortName(id)
                             str = string.gsub(str, 'name":"', 'name":"'..randomid..' - ')
@@ -349,7 +366,11 @@
                                 list[#list+1] = str
                             elseif not match and not tagged then
                                 list[#list+1] = str
-                            end               
+                            end
+                            if targetCode == randomid then
+                                specialRadarTargets[1]=str
+                                system.print("id match")
+                            end
                         end
                     return '{"constructsList":['..table.concat(list,',')..'],'..data:match('"elementId":".+')
                     end
@@ -359,21 +380,33 @@
                 rf = ''
                 FCS_locked = false
                 local _data = updateRadar(radarOnlyEnemeies)
-                    
                 local _panel = system.createWidgetPanel("RADAR")
                 local _widget = system.createWidget(_panel, "value")
-                radarFilter = system.createData('{"label":"Filter","'..fm..''..rf..'","unit": ""}') 
+                radarFilter = system.createData('{"label":"Filter","'..fm..''..rf..'","unit": ""}')
                 system.addDataToWidget(radarFilter, _widget)
                 local _widget = system.createWidget(_panel, "radar")
-                radarData = system.createData(_data) 
+                radarData = system.createData(_data)
                 system.addDataToWidget(radarData, _widget)
+
+
+                function specialTargetRadar()
+                    local data = radar.getData()
+                    local _dataS = '{"constructsList":['..table.concat(specialRadarTargets,',')..'],'..data:match('"elementId":".+')
+                    local _panelS = system.createWidgetPanel("RADAR")
+                    local _widgetS = system.createWidget(_panelS, "value") 
+                    system.addDataToWidget(radarFilter, _widgetS)
+                    local _widgetS = system.createWidget(_panelS, "radar")
+                    radarDataS = system.createData(_dataS) 
+                    system.addDataToWidget(radarDataS, _widgetS)
+                end
+
 
                 allyAmount = 0
                 function getAlliedInfo()
                     local htmlAllies = ""
                     allyAmount = #allies
                     local tooMany = false
-                    if allyAmount > maxAllies then tooMany = true end    
+                    if allyAmount > maxAllies then tooMany = true end
                     for i=1, #allies do
                         if i < (maxAllies+1) then
                             local id = allies[i]
@@ -401,7 +434,7 @@
                       <th style="width:10%">Owner</th>
                     </tr>]]
                        return alliesHead
-                    end 
+                    end
                 end
                 function drawAlliesHtml()
                     alliesHtml = [[
@@ -427,14 +460,14 @@
                                 <th style="width:10%">Threat Lvl</th>
                             </tr>]]
                             return threatsHead
-                        end 
+                        end
                     end
                     function getThreatsInfo()
                         local threatInfo = ""
                         for i=1,threatsAmount do
                             local id = threats[i]
                             local threatDist = radar.getConstructDistance(id)
-                            
+
                             if threatDist < 1000 then
                                 threatDist = string.format('%0.2f',threatDist).."m"
                             elseif threatDist < 100000 then
@@ -458,7 +491,7 @@
                         end
                         return threatInfo
                     end
-                    
+
                     threatsHtml =[[
                     <div class="locked">
                         <table class="customTable">
@@ -544,9 +577,9 @@
                     }</style>
                     <html class='alarmBorder'></html>]]
                 end
-                
+
                 function drawHud()
-                    
+
                     html = alarmStyles..cssAllyLocked..healthHtml..alliesHtml..threatsHtml..ownInfoHtml
                     system.setScreen(html)
                 end
