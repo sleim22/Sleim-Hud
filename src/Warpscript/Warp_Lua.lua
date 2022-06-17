@@ -288,7 +288,7 @@
 
                     function addFuelTank(tank,i)
                         local color = "green"
-                        local percent = json.decode(tank.getData()).percentage
+                        local percent = json.decode(tank.getWidgetData()).percentage
                          if percent == nil then 
                                             percent = 0 
                                             color = "red"
@@ -351,12 +351,12 @@
                 function speedInfo()
                                     local throttle = math.floor(unit.getThrottle())
                                     local speed = math.floor(vec3(core.getWorldVelocity()):len() * 3.6)
-                                    local accel = math.floor((json.decode(unit.getData()).acceleration/9.80665)*10)/10
+                                    local accel = math.floor((json.decode(unit.getWidgetData()).acceleration/9.80665)*10)/10
 
                                     local c = 8333.333
                                     local m0 = core.getConstructMass()
                                     local v0 = vec3(core.getWorldVelocity())
-                                    local controllerData = json.decode(unit.getData())
+                                    local controllerData = json.decode(unit.getWidgetData())
                                     local maxBrakeThrust = controllerData.maxBrake
                                     local time = 0.0
                                     dis = 0.0

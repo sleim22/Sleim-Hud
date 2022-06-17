@@ -85,7 +85,7 @@
                     return string.format('%02.f:%02.f:%02.f', wrapped_time.h, wrapped_time.m, wrapped_time.s)
                 end
                 function createWeaponData(weapon)
-                    local data = weapon.getData()
+                    local data = weapon.getWidgetData()
                     local dataObject = json.decode(data)
                     dataObject["properties"]["ammoName"] = "Thermic"
                     system.print(dataObject["properties"]["ammoName"])
@@ -109,7 +109,7 @@
                                 if i%2 ~= 0 then
                                 table.insert(WeaponPanaelIdList, system.createWidgetPanel(''))
                                 end
-                                local WeaponWidgetDataId = weapon[i].getDataId()
+                                local WeaponWidgetDataId = weapon[i].getWidgetDataId()
                                 local WeaponWidgetType = weapon[i].getWidgetType()
                                 system.addDataToWidget(WeaponWidgetDataId, system.createWidget(WeaponPanaelIdList[#WeaponPanaelIdList], WeaponWidgetType))
                             end
@@ -228,7 +228,7 @@
                         targetDistance = targetDistance/200000
                         distanceUnit= "su"
                     end
-                    probil = math.floor(json.decode(weapon_1.getData()).properties.hitProbability * 100)
+                    probil = math.floor(json.decode(weapon_1.getWidgetData()).properties.hitProbability * 100)
                     system.updateData(targetTitelData,'{"text": "'..targetName..'"}')
                     system.updateData(hitChance,'{"label": "Hit Chance", "value": "'..probil..'","unit":"%"}')
                     system.updateData(speed,'{"label": "Speed", "value": "'..speedChangeIcon..targetSpeed..'","unit":"km/h"}')
@@ -345,7 +345,7 @@
                     if radar_size > 1 and radar_1.isOperational()==0 then radar = radar_2 else radar = radar_1 end
                     allies={}
                     threats={}
-                    local data = radar.getData()
+                    local data = radar.getWidgetData()
                     if string.len(data) < 120000 then
                         local constructList = data:gmatch('({"constructId":".-%b{}.-})')
                         local list = {}
@@ -390,7 +390,7 @@
 
 
                 function specialTargetRadar()
-                    local data = radar.getData()
+                    local data = radar.getWidgetData()
                     local _dataS = '{"constructsList":['..table.concat(specialRadarTargets,',')..'],'..data:match('"elementId":".+')
                     local _panelS = system.createWidgetPanel("RADAR")
                     local _widgetS = system.createWidget(_panelS, "value") 
