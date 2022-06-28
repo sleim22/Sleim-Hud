@@ -591,6 +591,166 @@ function alarmBorder()
                     <html class='alarmBorder'></html>]]
 end
 
+function comma_value(amount)
+    local formatted = amount
+    while true do
+        formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+        if (k == 0) then
+            break
+        end
+    end
+    return formatted
+end
+
+function addDmgToTable(id, dmg)
+    local prevDmg = dmgTable[id]
+    if prevDmg == nil then
+        dmgTable[id] = dmg
+    else
+        dmgTable[id] = prevDmg + dmg
+    end
+end
+
+local enemyInfoDmg = "";
+dmgTable = {}
+
+function drawEnemyInfoDmgBar()
+    local targetId = radar.getTargetId()
+    local dmgDone = 0;
+    local dmgDoneFormatted = "";
+    local dmgPercent = 0;
+    if targetId == 0 then
+        enemyInfoDmg = "";
+    else
+
+        if radar.isConstructIdentified(targetId) == 1 then
+
+            dmgDone = dmgTable[targetId] or 0;
+            dmgPercent = (dmgDone / 100000)
+            if dmgPercent > 100 then dmgPercent = 100 end
+            if dmgDone > 1000000 then
+                dmgDoneFormatted = string.format('%0.2f', (dmgDone / 1000000)) .. "M"
+            elseif dmgDone > 1000 then
+                dmgDoneFormatted = string.format('%0.2f', (dmgDone / 1000)) .. "k"
+            end
+            targetDistance = math.floor(radar.getConstructDistance(targetId))
+            targetName = "[" ..
+                radar.getConstructCoreSize(targetId) .. "]-" ..
+                getShortName(targetId) .. "- " .. radar.getConstructName(targetId)
+            targetSpeed = math.floor(radar.getConstructSpeed(targetId) * 3.6)
+            if targetSpeed > oldSpeed then
+                speedChangeIcon = "↑"
+            elseif targetSpeed < oldSpeed then
+                speedChangeIcon = "↓"
+            else
+                speedChangeIcon = ""
+            end
+
+            if targetDistance > oldTargetDistance then
+                distanceChangeIcon = "↑"
+            elseif targetDistance < oldTargetDistance then
+                distanceChangeIcon = "↓"
+            else
+                distanceChangeIcon = ""
+            end
+            oldTargetDistance = targetDistance
+            oldSpeed = targetSpeed
+        end
+        if targetDistance < 1000 then
+            distanceUnit = "m"
+        elseif targetDistance < 100000 then
+            targetDistance = targetDistance / 1000
+            distanceUnit = "km"
+        else
+            targetDistance = targetDistance / 200000
+            distanceUnit = "su"
+        end
+        probil = math.floor(json.decode(weapon_1.getData()).properties.hitProbability * 100)
+        enemyInfoDmg = [[<style>
+        .enemyInfoCss {
+            position: fixed;
+            top: 8%;
+            left: 710px;
+            width: 500px;
+        color: #80ffff;
+        }
+    
+        .dmg-bar {
+            background: #142027;
+            color: white;
+            font-size: 10px;
+            border-radius: 5vh;
+            border: 1px solid;
+            border-color: #098dfe;
+        }
+    
+        .dmgBarFullness {
+            padding: 5px;
+            border-radius: 5vh;
+            height: 95%;
+        }
+    
+        table.dmgBar {
+            table-layout: fixed;
+            border-spacing: 0 0px;
+            border-collapse: separate;
+        }
+    
+        table.dmgBar td {
+            width: 110px;
+        }
+    </style>
+    <div class="enemyInfoCss">
+        <table class="dmgBar">
+            <tr>
+                <th colspan=5>*]] .. targetName .. [[*</th>
+            </tr>
+
+            <tr>
+                <td colspan=5 style="padding: 0px;">
+                    <div class="dmg-bar">
+                        <div class="dmgBarFullness" style="width: ]] ..
+            dmgPercent .. [[%;background:darkred;text-align: right;">]] .. dmgDoneFormatted .. [[</div>
+                    </div>
+                </td>
+
+            </tr>
+            <tr style="font-size: 12px;padding: 0px;">
+                <td colspan="2">0</td>
+                <td style="text-align: center;">5mil</td>
+                <td colspan="2" style="text-align: right;">10mil</td>
+            </tr>
+            <tr>
+                <td colspan="2"></td>
+                <td style="text-align: center;font-size: 18px;">Hitchance</td>
+                <td colspan="2"></td>
+
+            </tr>
+            <tr>
+                <td></td>
+                <td colspan="3">
+                    <div class="dmg-bar">
+                        <div class="dmgBarFullness" style="width: ]] ..
+            probil .. [[%;background:gray;text-align: center;">
+                            ]] .. probil .. [[%</div>
+                    </div>
+                </td>
+                <td></td>
+
+            </tr>
+            <tr>
+                <td style="text-align: right;">]] .. targetDistance .. distanceUnit .. [[</td>
+                <td style="text-align: right;">]] .. comma_value(targetSpeed) .. speedChangeIcon .. [[km/h</td>
+                <td></td>
+                <td>60k DPS</td>
+                <td>~5:15 min</td>
+            </tr>
+        </table>
+    </div>
+                        ]]
+    end
+end
+
 function drawHud()
 
     html = alarmStyles .. cssAllyLocked .. healthHtml .. alliesHtml .. threatsHtml .. ownInfoHtml
