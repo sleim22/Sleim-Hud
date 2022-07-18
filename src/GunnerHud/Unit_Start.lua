@@ -28,6 +28,8 @@ html = ""
 allies = {}
 threats = {}
 zone = construct.isInPvPZone()
+
+radar = radar_1
 if radar_size == 0 then
     system.print("Connect a space radar and run config again!")
     unit.exit()
@@ -111,11 +113,13 @@ end
 
 function getFriendlyDetails(id)
     owner = radar.getConstructOwnerEntity(id)
-    if owner.isOrganization then
+    if owner.id and owner.isOrganization then
         return system.getOrganization(owner.id).name
-    else
+    end
+    if owner.id and not owner.isOrganization then
         return system.getPlayerName(owner.id)
     end
+    return ""
 end
 
 function printNewRadarContacts()
@@ -132,7 +136,7 @@ function printNewRadarContacts()
             if showTime then
                 newTargetName = newTargetName .. ' - Time: ' .. seconds_to_clock(system.getArkTime())
             end
-            if radar.hasMatchingTransponder(v) == 1 then
+            if radar and radar.hasMatchingTransponder(v) == 1 then
                 newTargetName = newTargetName .. " - [Ally] Owner: " .. getFriendlyDetails(v)
                 if not borderActive then
                     borderColor = "green"
@@ -267,11 +271,45 @@ function drawShield()
     end
 end
 
+requiredTargets = {}
+function readRequiredValues()
+    if autoTargets then
+        requiredTargets = {}
+        local targets = require("Targets")
+        for _, v in pairs(targets) do
+            local id = v.shortid[1]
+            if id ~= targetCode then
+                requiredTargets[#requiredTargets + 1] = v.shortid[1]
+            end
+        end
+        package.loaded['Targets'] = nil
+
+        local transponders = require("Transponder")
+        local tablea = {}
+        local i = 1
+
+        for _, v in pairs(transponders) do
+            local transtag = v.transponder[1]
+            tablea[i] = v.transponder[1]
+            i = i + 1
+            transponder.setTags(tablea)
+        end
+        package.loaded['Transponder'] = nil
+    end
+end
+
+if pcall(require, "Transponder") and pcall(require, "Targets") and transponder then
+    unit.setTimer("loadRequired", 2)
+end
 specialRadarTargets = {}
 function updateRadar(match)
-    if radar_size > 1 and radar_1.getOperationalState() == 0 then radar = radar_2 else radar = radar_1 end
+    if radar_size > 1 then
+        if radar_1 == radar and radar_1.getOperationalState() == -1 then radar = radar_2 end
+        if radar_2 == radar and radar_2.getOperationalState() == -1 then radar = radar_1 end
+    end
     allies = {}
     threats = {}
+    specialRadarTargets = {}
     local data = radar.getWidgetData()
     if string.len(data) < 120000 then
         local constructList = data:gmatch('({"constructId":".-%b{}.-})')
@@ -279,7 +317,7 @@ function updateRadar(match)
         for str in constructList do
             local id = tonumber(str:match('"constructId":"([%d]*)"'))
             local tagged = radar.hasMatchingTransponder(id) == 0 and true or false
-            if radar.hasMatchingTransponder(id) == 1 then
+            if radar and radar.hasMatchingTransponder(id) == 1 then
                 allies[#allies + 1] = id
             end
             if radar.getThreatRateFrom(id) > 1 then
@@ -288,19 +326,28 @@ function updateRadar(match)
             local ident = radar.isConstructIdentified(id) == 1
             local randomid = getShortName(id)
             str = string.gsub(str, 'name":"', 'name":"' .. randomid .. ' - ')
-
             if match and tagged then
                 list[#list + 1] = str
             elseif not match and not tagged then
                 list[#list + 1] = str
             end
             if targetCode == randomid then
-                specialRadarTargets[1] = str
-                if not specialRadar then
-                    specialRadar = true
-                    specialTargetRadar()
+                table.insert(specialRadarTargets, 1, str)
+            end
+
+            for i = 1, #requiredTargets do
+                local requiredTarget = requiredTargets[i]
+
+                if requiredTarget == randomid then
+                    table.insert(specialRadarTargets, str)
                 end
             end
+
+            if not specialRadar and #specialRadarTargets > 0 then
+                specialRadar = true
+                specialTargetRadar()
+            end
+
         end
         return '{"constructsList":[' .. table.concat(list, ',') .. '],' .. data:match('"elementId":".+')
     end
@@ -322,14 +369,14 @@ system.addDataToWidget(radarData, _widget)
 
 specialRadar = false
 function specialTargetRadar()
+    local widgetTitel = "Targets"
+    if autoTargets then widgetTitel = widgetTitel .. " - AutoMode" end
     specialTimer = 0
     unit.setTimer("specialR", 0.1)
     local data = radar.getWidgetData()
     local _dataS = '{"constructsList":[' .. table.concat(specialRadarTargets, ',') .. '],' ..
         data:match('"elementId":".+')
-    _panelS = system.createWidgetPanel("RADAR")
-    local _widgetS = system.createWidget(_panelS, "value")
-    system.addDataToWidget(radarFilter, _widgetS)
+    _panelS = system.createWidgetPanel(widgetTitel)
     local _widgetS = system.createWidget(_panelS, "radar")
     radarDataS = system.createData(_dataS)
     system.addDataToWidget(radarDataS, _widgetS)
@@ -587,7 +634,7 @@ function enemyDPS()
             ttTenMil = ttTenMil - 1
             ttTenMilString = "~" .. seconds_to_clock(ttTenMil)
         end
-
+        if ttTenMil < 0 then ttTenMilString = "" end
         dps = round(dps / 1000, 2) .. "k"
     end
     if incDmg < 1 and dpsTableLenght == 60 then
@@ -610,44 +657,43 @@ end
 function drawEnemyInfoDmgBar()
     local targetId = radar.getTargetId()
 
-    if targetId == 0 then
+    if targetId == 0 or radar.isConstructIdentified(targetId) == 0 then
         enemyInfoDmg = "";
     else
 
-        if radar.isConstructIdentified(targetId) == 1 then
-            dmgDone = dmgTable[targetId] or 0;
-            dmgPercent = (dmgDone / 100000)
-            if dmgPercent > 100 then dmgPercent = 100 end
-            if dmgDone > 1000000 then
-                dmgDoneFormatted = string.format('%0.2f', (dmgDone / 1000000)) .. "M"
-            elseif dmgDone > 1000 then
-                dmgDoneFormatted = string.format('%0.2f', (dmgDone / 1000)) .. "k"
-            else
-                dmgDoneFormatted = "0"
-            end
-            targetDistance = math.floor(radar.getConstructDistance(targetId))
-            targetName = "[" ..
-                radar.getConstructCoreSize(targetId) .. "]-" ..
-                getShortName(targetId) .. "- " .. radar.getConstructName(targetId)
-            targetSpeed = math.floor(radar.getConstructSpeed(targetId) * 3.6)
-            if targetSpeed > oldSpeed then
-                speedChangeIcon = "↑"
-            elseif targetSpeed < oldSpeed then
-                speedChangeIcon = "↓"
-            else
-                speedChangeIcon = ""
-            end
-
-            if targetDistance > oldTargetDistance then
-                distanceChangeIcon = "↑"
-            elseif targetDistance < oldTargetDistance then
-                distanceChangeIcon = "↓"
-            else
-                distanceChangeIcon = ""
-            end
-            oldTargetDistance = targetDistance
-            oldSpeed = targetSpeed
+        dmgDone = dmgTable[targetId] or 0;
+        dmgPercent = (dmgDone / 100000)
+        if dmgPercent > 100 then dmgPercent = 100 end
+        if dmgDone > 1000000 then
+            dmgDoneFormatted = string.format('%0.2f', (dmgDone / 1000000)) .. "M"
+        elseif dmgDone > 1000 then
+            dmgDoneFormatted = string.format('%0.2f', (dmgDone / 1000)) .. "k"
+        else
+            dmgDoneFormatted = "0"
         end
+        targetDistance = math.floor(radar.getConstructDistance(targetId))
+        targetName = "[" ..
+            radar.getConstructCoreSize(targetId) .. "]-" ..
+            getShortName(targetId) .. "- " .. radar.getConstructName(targetId)
+        targetSpeed = math.floor(radar.getConstructSpeed(targetId) * 3.6)
+        if targetSpeed > oldSpeed then
+            speedChangeIcon = "↑"
+        elseif targetSpeed < oldSpeed then
+            speedChangeIcon = "↓"
+        else
+            speedChangeIcon = ""
+        end
+
+        if targetDistance > oldTargetDistance then
+            distanceChangeIcon = "↑"
+        elseif targetDistance < oldTargetDistance then
+            distanceChangeIcon = "↓"
+        else
+            distanceChangeIcon = ""
+        end
+        oldTargetDistance = targetDistance
+        oldSpeed = targetSpeed
+
         if targetDistance < 1000 then
             distanceUnit = "m"
         elseif targetDistance < 100000 then
@@ -657,7 +703,7 @@ function drawEnemyInfoDmgBar()
             targetDistance = targetDistance / 200000
             distanceUnit = "su"
         end
-        probil = math.floor(json.decode(weapon_1.getWidgetData()).properties.hitProbability * 100)
+        probil = round(weapon_1.getHitProbability(), 4) * 100
         enemyInfoDmg = [[<style>
                         .enemyInfoCss {
                             position: fixed;
@@ -732,10 +778,10 @@ function drawEnemyInfoDmgBar()
 
                             </tr>
                             <tr>
-                                <td style="text-align: right;">]] .. round(targetDistance, 2) ..
-            distanceUnit .. [[</td>
                                 <td style="text-align: right;">]] ..
-            comma_value(targetSpeed) .. speedChangeIcon .. [[km/h</td>
+            distanceChangeIcon .. " " .. round(targetDistance, 2) .. distanceUnit .. [[</td>
+                                <td style="text-align: right;">]] ..
+            speedChangeIcon .. " " .. comma_value(targetSpeed) .. [[km/h</td>
                                 <td></td>
                                 <td>]] .. dps .. [[ dps</td>
                                 <td>]] .. ttTenMilString .. [[</td>
@@ -751,7 +797,6 @@ function drawHud()
     system.setScreen(html)
 end
 
-radar = radar_1
 getMaxCorestress()
 system.setScreen(html)
 system.showScreen(1)
