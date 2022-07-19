@@ -791,9 +791,32 @@ function drawEnemyInfoDmgBar()
                                         ]]
     end
 end
-
+screenHeight = system.getScreenHeight()
+screenWidth = system.getScreenWidth()
+function crossHair()
+    local l = targetDistance
+    if l < 100000 then l = 100000 end
+    local pcrossHair = vec3(construct.getWorldPosition()) + l * vec3(construct.getWorldForward())
+    local ocrossHair = library.getPointOnScreen({ pcrossHair['x'], pcrossHair['y'], pcrossHair['z'] })
+    return [[<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
+    <circle cx="]] ..
+        screenWidth * ocrossHair[1] ..
+        [[" cy="]] .. screenHeight * ocrossHair[2] .. [[" r="5" stroke="gray" stroke-width="2" style="fill-opacity:0" />
+    </svg> 
+                    ]]
+end
+function drawAlliesOnScreen(){
+    local alliesAR = [[<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">]]
+    for _, v in ipairs(allies) do
+        local point = radar.getConstructWorldPos(v)
+        local allyPosOnScreen = library.getPointOnScreen({ point['x'], point['y'], point['z'] }) 
+        alliesAR = alliesAR.."<text x="..screenWidth * allyPosOnScreen[1].." y="..screenHeight * allyPosOnScreen[2] ..">"..v.."</text>"
+    end
+    return alliesAR.."</svg>"
+}
 function drawHud()
-    html = alarmStyles .. cssAllyLocked .. healthHtml .. alliesHtml .. threatsHtml .. ownInfoHtml .. enemyInfoDmg
+    html = alarmStyles ..
+        cssAllyLocked .. healthHtml .. alliesHtml .. threatsHtml .. ownInfoHtml .. enemyInfoDmg .. crossHair()
     system.setScreen(html)
 end
 
