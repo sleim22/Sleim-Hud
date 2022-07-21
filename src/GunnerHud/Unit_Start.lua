@@ -791,6 +791,7 @@ function drawEnemyInfoDmgBar()
                                         ]]
     end
 end
+
 screenHeight = system.getScreenHeight()
 screenWidth = system.getScreenWidth()
 function crossHair()
@@ -801,22 +802,42 @@ function crossHair()
     return [[<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
     <circle cx="]] ..
         screenWidth * ocrossHair[1] ..
-        [[" cy="]] .. screenHeight * ocrossHair[2] .. [[" r="5" stroke="gray" stroke-width="2" style="fill-opacity:0" />
+        [[" cy="]] ..
+        screenHeight * ocrossHair[2] .. [[" r="5" stroke="gray" stroke-width="2" style="fill-opacity:0" />
     </svg> 
                     ]]
 end
-function drawAlliesOnScreen(){
-    local alliesAR = [[<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">]]
-    for _, v in ipairs(allies) do
-        local point = radar.getConstructWorldPos(v)
-        local allyPosOnScreen = library.getPointOnScreen({ point['x'], point['y'], point['z'] }) 
-        alliesAR = alliesAR.."<text x="..screenWidth * allyPosOnScreen[1].." y="..screenHeight * allyPosOnScreen[2] ..">"..v.."</text>"
+
+alliesAR = ""
+function drawAlliesOnScreen()
+    if lshiftPressed then
+        alliesAR = [[<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">]]
+        for _, v in ipairs(allies) do
+            local point = vec3(radar.getConstructWorldPos(v))
+            local allyPosOnScreen = library.getPointOnScreen({ point['x'], point['y'], point['z'] })
+            local x = screenWidth * allyPosOnScreen[1]
+            local y = screenHeight * allyPosOnScreen[2]
+            if x > 0 and y > 0 then
+                alliesAR = alliesAR ..
+                    [[<circle cx="]] ..
+                    x ..
+                    [[" cy="]] ..
+                    y ..
+                    [[" r="5" stroke="green" stroke-width="2" style="fill-opacity:0" /><text x="]] ..
+                    x + 10 .. [[" y="]] .. y + 10 .. [[" fill="white">]] .. getFriendlyDetails(v) .. [[</text>]]
+            end
+        end
+        alliesAR = alliesAR .. "</svg>"
+    else
+        alliesAR = ""
     end
-    return alliesAR.."</svg>"
-}
+end
+
 function drawHud()
     html = alarmStyles ..
-        cssAllyLocked .. healthHtml .. alliesHtml .. threatsHtml .. ownInfoHtml .. enemyInfoDmg .. crossHair()
+        cssAllyLocked ..
+        healthHtml .. alliesHtml .. threatsHtml .. ownInfoHtml .. enemyInfoDmg .. crossHair() ..
+        alliesAR
     system.setScreen(html)
 end
 

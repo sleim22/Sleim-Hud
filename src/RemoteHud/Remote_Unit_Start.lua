@@ -606,6 +606,114 @@ function drawShield()
 	end
 end
 
+planetAR = ""
+function drawPlanetsOnScreen()
+	if lshiftPressed then
+		planetAR = [[<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">]]
+		for _, v in pairs(planetList) do
+			local point = vec3(v.center)
+			local distance = (point - vec3(construct.getWorldPosition())):len()
+			local planetPosOnScreen = library.getPointOnScreen({ point['x'], point['y'], point['z'] })
+			local xP = screenWidth * planetPosOnScreen[1]
+			local yP = screenHeight * planetPosOnScreen[2]
+			local deth = 12
+			local su = (distance / 200 / 1000)
+			if su < 10 then
+				deth = 250 - 800 * (distance / 1000 / 200 / 40)
+			elseif su < 40 then
+
+				deth = 20
+			end
+			
+				planetAR = planetAR ..
+					[[<circle cx="]] ..
+					xP ..
+					[[" cy="]] ..
+					yP ..
+					[[" r="]] .. deth .. [[" stroke="orange" stroke-width="1" style="fill-opacity:0" /><text x="]] ..
+					xP + deth ..
+					[[" y="]] ..
+					yP + deth .. [[" fill="white">]] .. v.name[1] ..
+					" " .. getDistanceDisplayString(distance) .. [[</text>]]
+			end
+		end
+		planetAR = planetAR .. "</svg>"
+	else
+		planetAR = ""
+	end
+end
+
+aliencores = { [1] = {
+	name = "Alpha",
+	pos = { 33946000.0000, 71381990.0000, 28850000.0000 }
+}, [2] = {
+	name = "Beta",
+	pos = { -145634000.0000, -10578000.0000, -739465.0000 }
+},
+	[3] = {
+		name = "Epsilon",
+		pos = { 48566000.0000, 19622000.0000, 101000000.0000 }
+	},
+	[4] = {
+		name = "Eta",
+		pos = { -73134000.0000, 18722000.0000, -93700000.0000 }
+	},
+	[5] = {
+		name = "Delta",
+		pos = { 13666000.0000, 1622000.0000, -46840000.0000 }
+	},
+	[6] = {
+		name = "Kappa",
+		pos = { -45533811.1992,-46877969.4094,-739352.8819 }
+	},
+	[7] = {
+		name = "Zeta",
+		pos = { 81766000.0000, 16912000.0000, 23860000.0000 }
+	},
+	[8] = {
+		name = "Theta",
+		pos = { 58166000.0000, -52378000.0000, -739465.0000 }
+	},
+	[9] = {
+		name = "Iota",
+		pos = { 966000.0000, -149278000.0000, -739465.0000 }
+	}, [10] = {
+		name = "Gamma",
+		pos = { -64334000.0000, 55522000.0000, -14400000.0000 }
+	},
+}
+alienAR = ""
+function drawAlienCores()
+	if lshiftPressed then
+		alienAR = ""
+		for _, v in pairs(aliencores) do
+			local point = vec3(v.pos)
+			local distance = (point - vec3(construct.getWorldPosition())):len()
+			local alienPosOnScreen = library.getPointOnScreen({ point['x'], point['y'], point['z'] })
+			local xP = screenWidth * alienPosOnScreen[1]
+			local yP = screenHeight * alienPosOnScreen[2]
+			if xP > 0 and yP > 0 then
+				alienAR = alienAR ..
+					[[<div style="position: fixed;left: ]] .. xP .. [[px;top:]] .. yP .. [[px;"><svg height="30" width="15">
+				<g>
+					<path style="fill:purple;" d="M8.472,0l-1.28,0.003c-2.02,0.256-3.679,1.104-4.671,2.386C1.685,3.47,1.36,4.78,1.553,6.283
+						c0.37,2.87,2.773,6.848,4.674,8.486c0.475,0.41,1.081,0.794,1.353,0.899c0.129,0.044,0.224,0.073,0.333,0.073
+						c0.11,0,0.217-0.031,0.319-0.091c1.234-0.603,2.438-1.88,3.788-4.02c0.936-1.485,2.032-3.454,2.2-5.495
+						C14.492,2.843,12.295,0.492,8.472,0z M8.435,0.69c3.431,0.447,5.337,2.462,5.097,5.391c-0.156,1.913-1.271,3.875-2.097,5.182
+						c-1.278,2.027-2.395,3.226-3.521,3.777c-0.005,0.002-0.009,0.004-0.012,0.005c-0.029-0.006-0.068-0.021-0.087-0.027
+						c-0.149-0.057-0.706-0.401-1.135-0.771c-1.771-1.525-4.095-5.375-4.44-8.052C2.07,4.879,2.348,3.741,3.068,2.812
+						c0.878-1.135,2.363-1.889,4.168-2.12L8.435,0.69z"/>
+					<path style="fill:purple;" d="M3.504,6.83C3.421,6.857,3.37,6.913,3.373,7.024c0.308,1.938,1.616,3.536,3.842,3.126
+						C7.002,8.019,5.745,6.933,3.504,6.83z"/>
+					<path style="fill:purple;" d="M8.778,10.215c2.196-0.125,3.61-1.379,3.776-3.319C10.321,6.727,8.55,7.923,8.778,10.215z"/>
+				</g>
+			</svg>]]..v.name.." " .. getDistanceDisplayString(distance) ..[[</div>]]
+			end
+		end
+	else
+		alienAR = ""
+	end
+end
 function combineHudElements()
 	drawFuelInfo()
 	brakeHud()
@@ -613,7 +721,7 @@ function combineHudElements()
 	drawPipeInfo()
 	drawEnemyDPS()
 	drawShield()
-	system.setScreen(fuelHtml .. brakeHtml .. speedHtml .. pipeInfoHtml .. enemyDPSHtml .. healthHtml)
+	system.setScreen(alienAR..fuelHtml .. brakeHtml .. speedHtml .. pipeInfoHtml .. enemyDPSHtml .. healthHtml)
 end
 
 unit.setTimer("dps", 1)
