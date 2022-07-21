@@ -31,3 +31,11 @@ Gunner Hud to provide useful information in 3rd person view
 7. Rightclick Remote Controller -> Advanced -> Run custom autoconfigure -> SleimRemoteHud
 
 
+## Hotkeys:
+- Alt + 1 to toggel shield
+- Alt + 2 to start/stop shield vent
+- LShift to toggle AR display
+- Alt + G to start/stop drift mode (disable inertia dampening)
+- Alt + C switch radar widget friendly/enemy mode
+
+
