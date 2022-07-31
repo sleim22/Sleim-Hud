@@ -1490,25 +1490,36 @@ function zeroConvertToWorldCoordinates(cl)
 end
 
 local hasCustomWaypoints, customWaypoints = pcall(require, "customWaypoints")
-
+if hasCustomWaypoints then
+    system.print("--------------")
+    system.print("Loaded " .. #customWaypoints .. " Custom Waypoints for AR:")
+    for _, v in pairs(customWaypoints) do
+        system.print(v.name)
+    end
+    system.print("--------------")
+end
 customWaypointsAR = ""
 function drawCustomWaypointsOnScreen()
     if lshiftPressed and hasCustomWaypoints then
         customWaypointsAR = [[<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">]]
         for _, v in pairs(customWaypoints) do
             local point = vec3(zeroConvertToWorldCoordinates(v.pos))
+            local distance = (point - vec3(construct.getWorldPosition())):len()
             local customWaypointsPosOnScreen = library.getPointOnScreen({ point['x'], point['y'], point['z'] })
             local x = screenWidth * customWaypointsPosOnScreen[1]
             local y = screenHeight * customWaypointsPosOnScreen[2]
+            local color = v.color or "red"
             if x > 0 and y > 0 then
                 customWaypointsAR = customWaypointsAR ..
                     [[<rect x="]] ..
-                    x ..
+                    x - 5 ..
                     [[" y="]] ..
-                    y ..
-                    [[" rx="5" ry="5" stroke="green" width="15" height="15" stroke-width="2" style="fill-opacity:0" /><text x="]]
-                    ..
-                    x + 20 .. [[" y="]] .. y + 20 .. [[" fill="white">]] .. v.name .. [[</text>]]
+                    y - 5 ..
+                    [[" rx="2" ry="2" stroke="]] ..
+                    color .. [[" width="10" height="10" stroke-width="2" style="fill-opacity:0" /><text x="]] ..
+                    x + 10 ..
+                    [[" y="]] ..
+                    y + 10 .. [[" fill="white">]] .. v.name .. " " .. getDistanceDisplayString(distance) .. [[</text>]]
             end
         end
         customWaypointsAR = customWaypointsAR .. "</svg>"
