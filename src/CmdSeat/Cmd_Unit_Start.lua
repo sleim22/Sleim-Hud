@@ -1474,6 +1474,49 @@ function drawAlliesOnScreen()
     end
 end
 
+function zeroConvertToWorldCoordinates(cl)
+    local q = ' *([+-]?%d+%.?%d*e?[+-]?%d*)'
+    local cm = '::pos{' .. q .. ',' .. q .. ',' .. q .. ',' .. q .. ',' .. q .. '}'
+    local cn, co, ci, cj, ch = string.match(cl, cm)
+    if cn == '0' and co == '0' then
+        return vec3(tonumber(ci), tonumber(cj), tonumber(ch))
+    end
+    cj = math.rad(cj)
+    ci = math.rad(ci)
+    local planet = atlas[tonumber(cn)][tonumber(co)]
+    local cp = math.cos(ci)
+    local cq = vec3(cp * math.cos(cj), cp * math.sin(cj), math.sin(ci))
+    return (vec3(planet.center) + (planet.radius + ch) * cq)
+end
+
+local hasCustomWaypoints, customWaypoints = pcall(require, "customWaypoints")
+
+customWaypointsAR = ""
+function drawCustomWaypointsOnScreen()
+    if lshiftPressed and hasCustomWaypoints then
+        customWaypointsAR = [[<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">]]
+        for _, v in pairs(customWaypoints) do
+            local point = vec3(zeroConvertToWorldCoordinates(v.pos))
+            local customWaypointsPosOnScreen = library.getPointOnScreen({ point['x'], point['y'], point['z'] })
+            local x = screenWidth * customWaypointsPosOnScreen[1]
+            local y = screenHeight * customWaypointsPosOnScreen[2]
+            if x > 0 and y > 0 then
+                customWaypointsAR = customWaypointsAR ..
+                    [[<rect x="]] ..
+                    x ..
+                    [[" y="]] ..
+                    y ..
+                    [[" rx="5" ry="5" stroke="green" width="15" height="15" stroke-width="2" style="fill-opacity:0" /><text x="]]
+                    ..
+                    x + 20 .. [[" y="]] .. y + 20 .. [[" fill="white">]] .. v.name .. [[</text>]]
+            end
+        end
+        customWaypointsAR = customWaypointsAR .. "</svg>"
+    else
+        customWaypointsAR = ""
+    end
+end
+
 function drawHud()
     drawFuelInfo()
     brakeHud()
@@ -1483,7 +1526,7 @@ function drawHud()
     drawShield()
     html = alarmStyles ..
         cssAllyLocked ..
-        healthHtml .. alliesHtml .. threatsHtml .. ownInfoHtml .. enemyInfoDmg .. crossHair() ..
+        healthHtml .. alliesHtml .. customWaypointsAR .. threatsHtml .. ownInfoHtml .. enemyInfoDmg .. crossHair() ..
         alliesAR ..
         alienAR .. planetAR .. fuelHtml .. brakeHtml .. speedHtml .. pipeInfoHtml .. enemyDPSHtml .. healthHtml
     system.setScreen(html)

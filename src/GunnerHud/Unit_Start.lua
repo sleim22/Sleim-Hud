@@ -799,13 +799,17 @@ function crossHair()
     if l < 100000 then l = 100000 end
     local pcrossHair = vec3(construct.getWorldPosition()) + l * vec3(construct.getWorldForward())
     local ocrossHair = library.getPointOnScreen({ pcrossHair['x'], pcrossHair['y'], pcrossHair['z'] })
-    return [[<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-    <circle cx="]] ..
-        screenWidth * ocrossHair[1] ..
-        [[" cy="]] ..
-        screenHeight * ocrossHair[2] .. [[" r="5" stroke="gray" stroke-width="2" style="fill-opacity:0" />
-    </svg> 
-                    ]]
+    local x = ocrossHair[1]
+    local y = ocrossHair[2]
+    if x > 0 and y > 0 then
+        return [[<div style="position: fixed;left: ]] ..
+            screenWidth * x ..
+            [[px;top:]] ..
+            screenHeight * y ..
+            [[px;width:15px;height:15px;"><svg viewBox="0 0 1024 1024" ><path fill="currentColor" d="M512 896a384 384 0 1 0 0-768 384 384 0 0 0 0 768zm0 64a448 448 0 1 1 0-896 448 448 0 0 1 0 896z"></path><path fill="currentColor" d="M512 96a32 32 0 0 1 32 32v192a32 32 0 0 1-64 0V128a32 32 0 0 1 32-32zm0 576a32 32 0 0 1 32 32v192a32 32 0 1 1-64 0V704a32 32 0 0 1 32-32zM96 512a32 32 0 0 1 32-32h192a32 32 0 0 1 0 64H128a32 32 0 0 1-32-32zm576 0a32 32 0 0 1 32-32h192a32 32 0 1 1 0 64H704a32 32 0 0 1-32-32z"></path></svg></div>]]
+    else
+        return ""
+    end
 end
 
 alliesAR = ""
@@ -830,6 +834,185 @@ function drawAlliesOnScreen()
         alliesAR = alliesAR .. "</svg>"
     else
         alliesAR = ""
+    end
+end
+
+atlas = require('atlas')
+
+planetList = {}
+for k, nextPlanet in pairs(atlas[0]) do
+    if nextPlanet.type[1] == "Planet" then
+        planetList[#planetList + 1] = nextPlanet
+        --system.print(nextPlanet.name[1])
+    end
+end
+planetAR = ""
+function drawPlanetsOnScreen()
+    screenHeight = system.getScreenHeight()
+    screenWidth = system.getScreenWidth()
+    if lshiftPressed then
+        planetAR = [[<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">]]
+        for _, v in pairs(planetList) do
+            local point = vec3(v.center)
+            local distance = (point - vec3(construct.getWorldPosition())):len()
+            local planetPosOnScreen = library.getPointOnScreen({ point['x'], point['y'], point['z'] })
+            local xP = screenWidth * planetPosOnScreen[1]
+            local yP = screenHeight * planetPosOnScreen[2]
+            local deth = 12
+            local su = (distance / 200 / 1000)
+            if su < 10 then
+                deth = 250 - 800 * (distance / 1000 / 200 / 40)
+            elseif su < 40 then
+
+                deth = 20
+            end
+            if xP > 0 and yP > 0 then
+                alienAR = alienAR .. [[<div style="position: fixed;left: ]] .. xP .. [[px;top:"]] .. yP .. [[px;"</div>]]
+                planetAR = planetAR ..
+                    [[<circle cx="]] ..
+                    xP ..
+                    [[" cy="]] ..
+                    yP ..
+                    [[" r="]] .. deth .. [[" stroke="orange" stroke-width="1" style="fill-opacity:0" /><text x="]] ..
+                    xP + deth ..
+                    [[" y="]] ..
+                    yP + deth .. [[" fill="#c7dcff">]] .. v.name[1] ..
+                    " " .. getDistanceDisplayString(distance) .. [[</text>]]
+            end
+        end
+        planetAR = planetAR .. "</svg>"
+    else
+        planetAR = ""
+    end
+end
+
+aliencores = { [1] = {
+    name = "Alpha",
+    pos = { 33946188.8008, 71382020.5906, 28850112.1181 }
+}, [2] = {
+    name = "Beta",
+    pos = { -145633811.1992, -10577969.4094, -739352.8819 }
+},
+    [3] = {
+        name = "Epsilon",
+        pos = { 48566188.8008, 19622030.5906, 101000112.1181 }
+    },
+    [4] = {
+        name = "Eta",
+        pos = { -73133811.1992, 18722030.5906, -93699887.8819 }
+    },
+    [5] = {
+        name = "Delta",
+        pos = { 13666188.8008, 1622030.5906, -46839887.8819 }
+    },
+    [6] = {
+        name = "Kappa",
+        pos = { -45533811.1992, -46877969.4094, -739352.8819 }
+    },
+    [7] = {
+        name = "Zeta",
+        pos = { 81766188.8008, 16912030.5906, 23860112.1181 }
+    },
+    [8] = {
+        name = "Theta",
+        pos = { 58166188.8008, -52377969.4094, -739352.8819 }
+    },
+    [9] = {
+        name = "Iota",
+        pos = { 966188.8008, -149277969.4094, -739352.8819 }
+    }, [10] = {
+        name = "Gamma",
+        pos = { -64333811.1992, 55522030.5906, -14399887.8819 }
+    },
+}
+
+alienAR = ""
+function drawAlienCores()
+    if lshiftPressed then
+        alienAR = ""
+        for _, v in pairs(aliencores) do
+            local point = vec3(v.pos)
+            local distance = (point - vec3(construct.getWorldPosition())):len()
+            local alienPosOnScreen = library.getPointOnScreen({ point['x'], point['y'], point['z'] })
+            local xP = screenWidth * alienPosOnScreen[1]
+            local yP = screenHeight * alienPosOnScreen[2]
+            if xP > 0 and yP > 0 then
+                alienAR = alienAR ..
+                    [[<div style="position: fixed;left: ]] ..
+                    xP .. [[px;top:]] .. yP .. [[px;"><svg height="30" width="15">
+                                <g>
+                                    <path style="fill:purple;" d="M8.472,0l-1.28,0.003c-2.02,0.256-3.679,1.104-4.671,2.386C1.685,3.47,1.36,4.78,1.553,6.283
+                                        c0.37,2.87,2.773,6.848,4.674,8.486c0.475,0.41,1.081,0.794,1.353,0.899c0.129,0.044,0.224,0.073,0.333,0.073
+                                        c0.11,0,0.217-0.031,0.319-0.091c1.234-0.603,2.438-1.88,3.788-4.02c0.936-1.485,2.032-3.454,2.2-5.495
+                                        C14.492,2.843,12.295,0.492,8.472,0z M8.435,0.69c3.431,0.447,5.337,2.462,5.097,5.391c-0.156,1.913-1.271,3.875-2.097,5.182
+                                        c-1.278,2.027-2.395,3.226-3.521,3.777c-0.005,0.002-0.009,0.004-0.012,0.005c-0.029-0.006-0.068-0.021-0.087-0.027
+                                        c-0.149-0.057-0.706-0.401-1.135-0.771c-1.771-1.525-4.095-5.375-4.44-8.052C2.07,4.879,2.348,3.741,3.068,2.812
+                                        c0.878-1.135,2.363-1.889,4.168-2.12L8.435,0.69z"/>
+                                    <path style="fill:purple;" d="M3.504,6.83C3.421,6.857,3.37,6.913,3.373,7.024c0.308,1.938,1.616,3.536,3.842,3.126
+                                        C7.002,8.019,5.745,6.933,3.504,6.83z"/>
+                                    <path style="fill:purple;" d="M8.778,10.215c2.196-0.125,3.61-1.379,3.776-3.319C10.321,6.727,8.55,7.923,8.778,10.215z"/>
+                                </g>
+                            </svg>]] .. v.name .. " " .. getDistanceDisplayString(distance) .. [[</div>]]
+            end
+        end
+    else
+        alienAR = ""
+    end
+end
+
+function getDistanceDisplayString(distance)
+    local su = distance > 100000
+    if su then
+        -- Convert to SU
+        return round(distance / 1000 / 200, 2) .. "SU"
+    elseif distance < 1000 then
+        return round(distance, 2) .. "M"
+    else
+        -- Convert to KM
+        return round(distance / 1000, 2) .. "KM"
+    end
+end
+
+function zeroConvertToWorldCoordinates(cl)
+    local q = ' *([+-]?%d+%.?%d*e?[+-]?%d*)'
+    local cm = '::pos{' .. q .. ',' .. q .. ',' .. q .. ',' .. q .. ',' .. q .. '}'
+    local cn, co, ci, cj, ch = string.match(cl, cm)
+    if cn == '0' and co == '0' then
+        return vec3(tonumber(ci), tonumber(cj), tonumber(ch))
+    end
+    cj = math.rad(cj)
+    ci = math.rad(ci)
+    local planet = atlas[tonumber(cn)][tonumber(co)]
+    local cp = math.cos(ci)
+    local cq = vec3(cp * math.cos(cj), cp * math.sin(cj), math.sin(ci))
+    return (vec3(planet.center) + (planet.radius + ch) * cq)
+end
+
+local hasCustomWaypoints, customWaypoints = pcall(require, "customWaypoints")
+
+customWaypointsAR = ""
+function drawCustomWaypointsOnScreen()
+    if lshiftPressed and hasCustomWaypoints then
+        customWaypointsAR = [[<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">]]
+        for _, v in pairs(customWaypoints) do
+            local point = vec3(zeroConvertToWorldCoordinates(v.pos))
+            local customWaypointsPosOnScreen = library.getPointOnScreen({ point['x'], point['y'], point['z'] })
+            local x = screenWidth * customWaypointsPosOnScreen[1]
+            local y = screenHeight * customWaypointsPosOnScreen[2]
+            if x > 0 and y > 0 then
+                customWaypointsAR = customWaypointsAR ..
+                    [[<rect x="]] ..
+                    x ..
+                    [[" y="]] ..
+                    y ..
+                    [[" rx="5" ry="5" stroke="green" width="15" height="15" stroke-width="2" style="fill-opacity:0" /><text x="]]
+                    ..
+                    x + 20 .. [[" y="]] .. y + 20 .. [[" fill="white">]] .. v.name .. [[</text>]]
+            end
+        end
+        customWaypointsAR = customWaypointsAR .. "</svg>"
+    else
+        customWaypointsAR = ""
     end
 end
 
