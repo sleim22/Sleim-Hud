@@ -312,7 +312,12 @@ function speedInfo()
 		resString = resString .. string.format(math.floor(dis))
 		brakeText = "M"
 	end
-
+	driftInfo = ""
+	if drift then
+		driftInfo = [[<tr>
+		<td style="text-align: center;" colspan="2"><h6>Inertia-Dampening: Off</h6></td>
+	</tr>]]
+	end
 	speedHtml = [[
                                         <style>
                                             h1,h6{
@@ -346,10 +351,8 @@ function speedInfo()
                                                 <tr>
                                                     <td style="text-align: right;"><h1>]] .. resString .. [[</h1></td>
                                                     <td>]] .. brakeText .. [[ Brake-Dist</td>
-                                                </tr>
-                                            </table>
-
-                                    ]]
+                                                </tr>]] .. driftInfo .. [[
+                                            </table>]]
 end
 
 counter = 1
@@ -630,7 +633,8 @@ function combineHudElements()
 	drawPipeInfo()
 	drawEnemyDPS()
 	drawShield()
-	system.setScreen(alienAR .. planetAR .. fuelHtml .. brakeHtml .. speedHtml .. pipeInfoHtml .. enemyDPSHtml .. healthHtml)
+	system.setScreen(alienAR ..
+		planetAR .. fuelHtml .. brakeHtml .. speedHtml .. pipeInfoHtml .. enemyDPSHtml .. healthHtml)
 end
 
 unit.setTimer("hud", 0.1)

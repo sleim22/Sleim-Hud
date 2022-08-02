@@ -413,8 +413,8 @@ function alliesHead()
         return ""
     else
         local alliesHead = [[<tr>
-                      <th style="width:90%">ShipInfo</th>
-                      <th style="width:10%">Owner</th>
+                      <th style="width:max-content;max-width:80%">ShipInfo</th>
+                      <th style="width:max-content;max-width:30%">Owner</th>
                     </tr>]]
         return alliesHead
     end
@@ -441,8 +441,8 @@ function drawThreatsHtml()
         else
             local threatsHead = [[
                             <tr>
-                                <th style="width:90%">ShipInfo</th>
-                                <th style="width:10%">Threat Lvl</th>
+                                <th style="width:max-content;max-width:80%">ShipInfo</th>
+                                <th style="width:max-content;max-width:30%">Threat Lvl</th>
                             </tr>]]
             return threatsHead
         end
@@ -867,7 +867,6 @@ function drawPlanetsOnScreen()
                 deth = 20
             end
             if xP > 0 and yP > 0 then
-                alienAR = alienAR .. [[<div style="position: fixed;left: ]] .. xP .. [[px;top:"]] .. yP .. [[px;"</div>]]
                 planetAR = planetAR ..
                     [[<circle cx="]] ..
                     xP ..
@@ -1028,11 +1027,23 @@ function drawCustomWaypointsOnScreen()
     end
 end
 
+mouseHtml = ""
+function drawMouse()
+    if system.isViewLocked() == 1 then
+        local x = system.getMousePosX()
+        local y = system.getMousePosY()
+        mouseHtml = [[<svg  width="100%" height="100%"><circle cx=]] ..
+            x .. [[ cy=]] .. y .. [[ r=55 stroke="red" stroke-width="3" fill="red"></svg>]]
+    else
+        mouseHtml = ""
+    end
+end
+
 function drawHud()
     html = alarmStyles ..
         cssAllyLocked ..
         healthHtml .. alliesHtml .. threatsHtml .. ownInfoHtml .. enemyInfoDmg .. crossHair() ..
-        alliesAR
+        alliesAR .. mouseHtml
     system.setScreen(html)
 end
 
