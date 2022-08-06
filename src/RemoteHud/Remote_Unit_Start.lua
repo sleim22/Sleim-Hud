@@ -365,6 +365,8 @@ lastShield = shield.getShieldHitpoints()
 adjustShield = false
 autoAdjustShield = false --export: NOT RECOMMENDED! Will audo adjust every minute based on current stress
 shieldDownColor = ""
+ShieldRes = {}
+ShieldDisplay = {}
 function enemyDPS()
 	local incDmg = 0
 	local newShield = shield.getShieldHitpoints()
@@ -423,90 +425,167 @@ function autoAdjust()
 end
 
 function drawEnemyDPS()
-	local resistances = shield.getResistances()
-	local amRes = math.ceil(10 + resistances[1] * 100)
-	local elRes = math.ceil(10 + resistances[2] * 100)
-	local kiRes = math.ceil(10 + resistances[3] * 100)
-	local thRes = math.ceil(10 + resistances[4] * 100)
 	local resCd = math.floor(shield.getResistancesCooldown())
 	local ventCd = math.floor(shield.getVentingCooldown())
 
 	local sRR = shield.getStressRatioRaw()
-	function stressColor(stress)
-		if stress > 55 then
-			return "red"
-		elseif stress > 0 then
-			return "orange"
-		else
-			return ""
-		end
+
+
+
+	screenHeight = system.getScreenHeight()
+	screenWidth = system.getScreenWidth()
+	ShieldDisplay.startX = screenWidth * 0.17
+	ShieldDisplay.startY = screenHeight * 25 / 1080
+	ShieldDisplay.resFactorX = screenWidth / 1920
+	ShieldDisplay.resFactorY = screenHeight / 1080
+	--system.print(ShieldDisplay.resFactorX)
+
+	ShieldDisplay.totalWidth = 350 * ShieldDisplay.resFactorX
+	ShieldDisplay.totalHeight = 250 * ShieldDisplay.resFactorY
+	ShieldDisplay.resBarWidth = ShieldDisplay.totalWidth * 3 / 5
+	ShieldDisplay.barMargin = 25 * ShieldDisplay.resFactorY
+	ShieldDisplay.textMargin = 20 * ShieldDisplay.resFactorY
+	ShieldDisplay.barStart = 60 * ShieldDisplay.resFactorY
+	local resistances = shield.getResistances()
+
+
+	ShieldRes.maxPool = shield.getResistancesPool()
+
+	if not leftAltPressed then
+		ShieldRes.currentPool = shield.getResistancesRemaining()
+		ShieldRes[1] = { resistances[1], "AM", sRR[1] }
+		ShieldRes[2] = { resistances[2], "EM", sRR[2] }
+		ShieldRes[3] = { resistances[3], "KI", sRR[3] }
+		ShieldRes[4] = { resistances[4], "TH", sRR[4] }
+
 	end
+	ShieldDisplay.setString = "Set"
+	if resCd > 0 then
+		ShieldDisplay.setString = resCd .. " s"
+	end
+	ShieldDisplay.ventString = "Vent"
+	if ventCd > 0 then
+		ShieldDisplay.ventString = ventCd .. " sec"
+	end
+	if (calculating and shield.isActive() == 1) or shield.isVenting() == 1 or ventCd > 0 or leftAltPressed or resCd > 0 then
+		ShieldDisplay.HTML = [[
 
-	local amStress = math.floor(sRR[1] * 100)
-	local elStress = math.floor(sRR[2] * 100)
-	local kiStress = math.floor(sRR[3] * 100)
-	local thStress = math.floor(sRR[4] * 100)
+ <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;fill:white;stroke:#80ffff;font-weight:bold">
 
-	if (calculating and shield.isActive() == 1) or shield.isVenting() == 1 or ventCd > 0 then
-		enemyDPSHtml = [[
-                    <style>
-                        .enemyDPS{
-                            position: fixed;
-                            left: 25%;
-                            bottom: 35%;
-                        }
-                        table.cd{
-                            table-layout: fixed;
-                            text-align: left;
-                        }
-                        table.resTable{
-                            table-layout: fixed;
-                            text-align: center;
-                        }
-                        table.resTable th {
-                            width: 33% ;
-                        } 
-                    </style>
-                    <div class="enemyDPS">
-                        <h3>Enemy-DPS: ]] .. dps .. [[</h3>
-                        <h3 style="color:]] .. shieldDownColor .. [[">Shield Down in: ]] .. ttZString .. [[</h3>
-                        <table class="cd">
-                            <tr>
-                                <th>Vent-CD: ]] .. ventCd .. [[s</th>
-                                <th>Res-CD: ]] .. resCd .. [[s</th>
-                            </tr>
-                        </table>
-                        <table class="resTable">
-                            <tr>
-                                <th>Type</th>
-                                <th>Res</th>
-                                <th>Stress</th>
-                            </tr>
-                            <tr style="color:]] .. stressColor(amStress) .. [[">
-                                <td>AM</td>
-                                <td>]] .. amRes .. [[%</td>
-                                <td>]] .. amStress .. [[%</td>
-                            </tr>
-                            <tr style="color:]] .. stressColor(elStress) .. [[">
-                                <td>EL</td>
-                                <td>]] .. elRes .. [[%</td>
-                                <td>]] .. elStress .. [[%</td>
-                            </tr>
-                            <tr style="color:]] .. stressColor(kiStress) .. [[">
-                                <td>KI</td>
-                                <td>]] .. kiRes .. [[%</td>
-                                <td>]] .. kiStress .. [[%</td>
-                            </tr>
-                            <tr style="color:]] .. stressColor(thStress) .. [[">
-                                <td>TH</td>
-                                <td>]] .. thRes .. [[%</td>
-                               <td>]] .. thStress .. [[%</td>
-                            </tr>
-                        </table>
-                    </div>
-                    ]]
+	<rect x="]] ..
+			ShieldDisplay.startX ..
+			[[" y="]] ..
+			ShieldDisplay.startY ..
+			[[" rx="20" ry="20" width="]] ..
+			ShieldDisplay.totalWidth ..
+			[[" height="]] .. ShieldDisplay.totalHeight .. [[" style="stroke-width:2;fill-opacity:0"/>
+
+	<text x="]] ..
+			ShieldDisplay.startX + 30 ..
+			[[" y="]] .. ShieldDisplay.startY + ShieldDisplay.textMargin .. [[">Enemy DPS: ]] .. dps .. [[</text>
+	<text x="]] ..
+			ShieldDisplay.startX + 30 ..
+			[[" y="]] ..
+			ShieldDisplay.startY + ShieldDisplay.textMargin * 2 ..
+			[[" fill="]] .. shieldDownColor .. [[">Time till shield down: ]] .. ttZString .. [[</text>
+        <line x1="]] ..
+			ShieldDisplay.startX + 10 ..
+			[[" y1="]] ..
+			ShieldDisplay.startY + ShieldDisplay.barMargin * 2 ..
+			[[" x2="]] ..
+			ShieldDisplay.startX + ShieldDisplay.totalWidth - 10 ..
+			[[" y2="]] .. ShieldDisplay.startY + ShieldDisplay.barMargin * 2 .. [[" style="stroke-width:2" />
+	
+	<text x="]] ..
+			ShieldDisplay.startX + 30 ..
+			[[" y="]] ..
+			ShieldDisplay.startY + ShieldDisplay.barMargin * 3 ..
+			[[">Points left: ]] .. math.floor(ShieldRes.currentPool * 100) ..
+			"/" .. math.floor(ShieldRes.maxPool * 100) .. [[</text>
+
+	]]
+
+		for i = 1, 4, 1 do
+			ShieldDisplay.HTML = ShieldDisplay.HTML ..
+				[[<text x="]] ..
+				ShieldDisplay.startX + 12 ..
+				[[" y="]] ..
+				ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * i + 8 ..
+				[[" font-weight:"lighter" font-size="10">]] .. ShieldRes[i][2] .. [[</text>
+		<rect x="]] ..
+				ShieldDisplay.startX + 30 ..
+				[[" y="]] ..
+				ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * i ..
+				[[" rx="2" ry="2" width="]] ..
+				ShieldDisplay.resBarWidth * ShieldRes[i][1] / ShieldRes.maxPool ..
+				[[" height="10" style="stroke-width:0;fill-opacity:0.8;fill:white" />
+		<rect x="]] ..
+				ShieldDisplay.startX + 30 ..
+				[[" y="]] ..
+				ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * i ..
+				[[" rx="2" ry="2" width="]] .. ShieldDisplay.resBarWidth ..
+				[[" height="10" style="stroke-width:2;fill-opacity:0" />
+		
+		<rect x="]] ..
+				ShieldDisplay.startX + ShieldDisplay.resBarWidth + 40 ..
+				[[" y="]] ..
+				ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * i ..
+				[[" rx="2" ry="2" width="]] ..
+				(ShieldDisplay.totalWidth - ShieldDisplay.resBarWidth - 60) * ShieldRes[i][3] ..
+				[[" height="10" style="stroke-width:0;fill-opacity:0.8;fill:red" />
+		<rect x="]] ..
+				ShieldDisplay.startX + ShieldDisplay.resBarWidth + 40 ..
+				[[" y="]] ..
+				ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * i ..
+				[[" rx="2" ry="2" width="]] ..
+				(ShieldDisplay.totalWidth - ShieldDisplay.resBarWidth - 60) ..
+				[[" height="10" style="stroke-width:2;fill-opacity:0" />
+		
+		]]
+		end
+		ShieldDisplay.HTML = ShieldDisplay.HTML .. [[
+	
+	<rect x="]] ..
+			ShieldDisplay.startX + 30 * ShieldDisplay.resFactorX ..
+			[[" y="]] ..
+			ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 5 ..
+			[[" rx="4" ry="4" width="]] ..
+			50 * ShieldDisplay.resFactorX .. [[" height="40" style="fill:yellow;stroke-width:2;fill-opacity:0" />
+	<text x="]] ..
+			ShieldDisplay.startX + 45 * ShieldDisplay.resFactorX ..
+			[[" y="]] ..
+			ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 6 ..
+			[[" style="font-weight:bold">]] .. ShieldDisplay.setString .. [[</text>
+	
+        <rect x="]] ..
+			ShieldDisplay.startX + 90 * ShieldDisplay.resFactorX ..
+			[[" y="]] ..
+			ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 5 ..
+			[[" rx="4" ry="4" width="]] ..
+			50 * ShieldDisplay.resFactorX .. [[" height="40" style="fill:yellow;stroke-width:2;fill-opacity:0" />
+	    <text x="]] ..
+			ShieldDisplay.startX + 98 * ShieldDisplay.resFactorX ..
+			[[" y="]] ..
+			ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 6 ..
+			[[" style="font-weight:bold">Reset</text>
+	
+     <rect x="]] ..
+			ShieldDisplay.startX + ShieldDisplay.resBarWidth + ShieldDisplay.textMargin * 2 ..
+			[[" y="]] ..
+			ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 5 ..
+			[[" rx="4" ry="4" width="]] ..
+			(ShieldDisplay.totalWidth - ShieldDisplay.resBarWidth - 60) ..
+			[[" height="40" style="fill:yellow;stroke-width:2;fill-opacity:0" />
+	<text x="]] ..
+			ShieldDisplay.startX + ShieldDisplay.resBarWidth + ShieldDisplay.textMargin * 3 ..
+			[[" y="]] ..
+			ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 6 ..
+			[[" style="font-weight:bold">]] .. ShieldDisplay.ventString .. [[</text>
+	
+	</svg>]]
+
 	else
-		enemyDPSHtml = ""
+		ShieldDisplay.HTML = ""
 	end
 end
 
@@ -626,6 +705,19 @@ function drawShield()
 	end
 end
 
+mouseHtml = ""
+leftAltPressed = false
+function drawMouse()
+	if leftAltPressed then
+		local x = system.getMousePosX()
+		local y = system.getMousePosY()
+		mouseHtml = [[<svg  width="100%" height="100%" style="position: absolute;left:0%;top:0%;"><circle cx=]] ..
+			x .. [[ cy=]] .. y .. [[ r=2 stroke="red" stroke-width="3" fill="red"></svg>]]
+	else
+		mouseHtml = ""
+	end
+end
+
 function combineHudElements()
 	drawFuelInfo()
 	brakeHud()
@@ -633,8 +725,9 @@ function combineHudElements()
 	drawPipeInfo()
 	drawEnemyDPS()
 	drawShield()
+	drawMouse()
 	system.setScreen(alienAR ..
-		planetAR .. fuelHtml .. brakeHtml .. speedHtml .. pipeInfoHtml .. enemyDPSHtml .. healthHtml)
+		planetAR .. fuelHtml .. brakeHtml .. speedHtml .. pipeInfoHtml .. ShieldDisplay.HTML .. healthHtml .. mouseHtml)
 end
 
 unit.setTimer("hud", 0.1)
