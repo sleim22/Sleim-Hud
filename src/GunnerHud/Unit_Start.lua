@@ -413,8 +413,8 @@ function alliesHead()
         return ""
     else
         local alliesHead = [[<tr>
-                      <th style="width:90%">ShipInfo</th>
-                      <th style="width:10%">Owner</th>
+                      <th style="width:max-content;max-width:80%">ShipInfo</th>
+                      <th style="width:max-content;max-width:30%">Owner</th>
                     </tr>]]
         return alliesHead
     end
@@ -441,8 +441,8 @@ function drawThreatsHtml()
         else
             local threatsHead = [[
                             <tr>
-                                <th style="width:90%">ShipInfo</th>
-                                <th style="width:10%">Threat Lvl</th>
+                                <th style="width:max-content;max-width:80%">ShipInfo</th>
+                                <th style="width:max-content;max-width:30%">Threat Lvl</th>
                             </tr>]]
             return threatsHead
         end
@@ -654,6 +654,20 @@ function round(num, numDecimalPlaces)
     return math.floor(num * mult + 0.5) / mult
 end
 
+function getMaxSpeedByMass(m)
+    if m then
+        m = m / 1000
+        local speed = 50376.8 - 62.5683 * m + 0.0659543 * m ^ 2 - 0.000036692 * m ^ 3 + 7.8824910 ^ -9 * m ^ 4
+
+        if speed > 50000 then
+            speed = 50000
+        elseif speed < 20000 then
+            speed = 20000
+        end
+        return speed
+    end
+end
+
 function drawEnemyInfoDmgBar()
     local targetId = radar.getTargetId()
 
@@ -703,6 +717,7 @@ function drawEnemyInfoDmgBar()
             targetDistance = targetDistance / 200000
             distanceUnit = "su"
         end
+        local maxSpeed = comma_value(math.floor(getMaxSpeedByMass(radar.getConstructMass(targetId))))
         probil = round(weapon_1.getHitProbability(), 4) * 100
         enemyInfoDmg = [[<style>
                         .enemyInfoCss {
@@ -781,7 +796,7 @@ function drawEnemyInfoDmgBar()
                                 <td style="text-align: right;">]] ..
             distanceChangeIcon .. " " .. round(targetDistance, 2) .. distanceUnit .. [[</td>
                                 <td style="text-align: right;">]] ..
-            speedChangeIcon .. " " .. comma_value(targetSpeed) .. [[km/h</td>
+            speedChangeIcon .. " " .. comma_value(targetSpeed) .. [[km/h / ~]] .. maxSpeed .. [[</td>
                                 <td></td>
                                 <td>]] .. dps .. [[ dps</td>
                                 <td>]] .. ttTenMilString .. [[</td>
@@ -867,7 +882,6 @@ function drawPlanetsOnScreen()
                 deth = 20
             end
             if xP > 0 and yP > 0 then
-                alienAR = alienAR .. [[<div style="position: fixed;left: ]] .. xP .. [[px;top:"]] .. yP .. [[px;"</div>]]
                 planetAR = planetAR ..
                     [[<circle cx="]] ..
                     xP ..
@@ -1028,11 +1042,23 @@ function drawCustomWaypointsOnScreen()
     end
 end
 
+mouseHtml = ""
+function drawMouse()
+    if system.isViewLocked() == 1 then
+        local x = system.getMousePosX()
+        local y = system.getMousePosY()
+        mouseHtml = [[<svg  width="100%" height="100%"><circle cx=]] ..
+            x .. [[ cy=]] .. y .. [[ r=55 stroke="red" stroke-width="3" fill="red"></svg>]]
+    else
+        mouseHtml = ""
+    end
+end
+
 function drawHud()
     html = alarmStyles ..
         cssAllyLocked ..
         healthHtml .. alliesHtml .. threatsHtml .. ownInfoHtml .. enemyInfoDmg .. crossHair() ..
-        alliesAR
+        alliesAR .. mouseHtml
     system.setScreen(html)
 end
 
