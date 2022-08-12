@@ -668,6 +668,11 @@ function getMaxSpeedByMass(m)
     end
 end
 
+local oldTargetSpeed = 999990
+local speedCounter = 0
+local speedAnnounced = 999999
+local callSpeed = true --export:
+local callSpeedCange = true --export:
 function drawEnemyInfoDmgBar()
     local targetId = radar.getTargetId()
 
@@ -697,6 +702,37 @@ function drawEnemyInfoDmgBar()
         else
             speedChangeIcon = ""
         end
+
+        if callSpeed then
+            local factor = math.floor(round(targetSpeed / 5000))
+            if speedAnnounced ~= 5000 * factor and targetSpeed > 5000 * factor - 100 and
+                targetSpeed < 5000 * factor + 100 then
+                system.print("Speed: " .. 5000 * factor)
+                table.insert(Sound, "speed" .. 5000 * factor)
+                oldTargetSpeed = targetSpeed
+                speedAnnounced = 5000 * factor
+            end
+        end
+
+        if callSpeedCange then
+            local speedChangeLimit = 2500
+            if targetSpeed < 1500 then speedChangeLimit = 1000 end
+            if targetSpeed == oldTargetSpeed then
+                if speedCounter < 100 then
+                    speedCounter = speedCounter + 1
+                else
+                    table.insert(Sound, "speedholding")
+                    speedCounter = 0
+                end
+            elseif targetSpeed - oldTargetSpeed > speedChangeLimit then
+                oldTargetSpeed = targetSpeed
+                table.insert(Sound, "speedup")
+            elseif oldTargetSpeed - targetSpeed > speedChangeLimit then
+                oldTargetSpeed = targetSpeed
+                table.insert(Sound, "speeddown")
+            end
+        end
+
 
         if targetDistance > oldTargetDistance then
             distanceChangeIcon = "↑"
