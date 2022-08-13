@@ -672,12 +672,16 @@ local oldTargetSpeed = 999990
 local speedCounter = 0
 local speedAnnounced = 999999
 local callSpeed = true --export:
-local callSpeedCange = true --export:
+local callSpeedChange = true --export:
+local speedUpOrDown = ""
 function drawEnemyInfoDmgBar()
     local targetId = radar.getTargetId()
-
     if targetId == 0 or radar.isConstructIdentified(targetId) == 0 then
         enemyInfoDmg = "";
+        oldTargetSpeed = 999999
+        speedCounter = 0
+        speedAnnounced = 999999
+        speedUpOrDown = ""
     else
 
         dmgDone = dmgTable[targetId] or 0;
@@ -707,29 +711,38 @@ function drawEnemyInfoDmgBar()
             local factor = math.floor(round(targetSpeed / 5000))
             if speedAnnounced ~= 5000 * factor and targetSpeed > 5000 * factor - 100 and
                 targetSpeed < 5000 * factor + 100 then
-                system.print("Speed: " .. 5000 * factor)
                 table.insert(Sound, "speed" .. 5000 * factor)
                 oldTargetSpeed = targetSpeed
                 speedAnnounced = 5000 * factor
             end
         end
 
-        if callSpeedCange then
-            local speedChangeLimit = 2500
-            if targetSpeed < 1500 then speedChangeLimit = 1000 end
-            if targetSpeed == oldTargetSpeed then
-                if speedCounter < 100 then
-                    speedCounter = speedCounter + 1
-                else
-                    table.insert(Sound, "speedholding")
-                    speedCounter = 0
-                end
-            elseif targetSpeed - oldTargetSpeed > speedChangeLimit then
+        if callSpeedChange then
+            local speedChangeLimit = 1000
+            if targetSpeed - oldTargetSpeed > speedChangeLimit then
                 oldTargetSpeed = targetSpeed
-                table.insert(Sound, "speedup")
+                speedCounter = 0
+                if speedUpOrDown ~= "up" then
+                    speedUpOrDown = "up"
+                    table.insert(Sound, "speedup")
+                end
             elseif oldTargetSpeed - targetSpeed > speedChangeLimit then
                 oldTargetSpeed = targetSpeed
-                table.insert(Sound, "speeddown")
+                speedCounter = 0
+                if speedUpOrDown ~= "down" then
+                    speedUpOrDown = "down"
+                    table.insert(Sound, "speeddown")
+                end
+            else
+                if speedCounter < 150 then
+                    speedCounter = speedCounter + 1
+                else
+                    if speedUpOrDown ~= "holding" then
+                        speedUpOrDown = "holding"
+                        table.insert(Sound, "speedholding")
+                    end
+                    speedCounter = 0
+                end
             end
         end
 
