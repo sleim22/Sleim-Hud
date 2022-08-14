@@ -147,8 +147,8 @@ function printNewRadarContacts()
             elseif radar.isConstructAbandoned(v) == 1 then
                 newTargetName = newTargetName .. " - Abandoned"
             else
-                system.playSound("contact.mp3")
                 if not borderActive then
+                    play("newContact")
                     borderActive = true
                     borderColor = "red"
                     borderWidth = 200
@@ -668,11 +668,20 @@ function getMaxSpeedByMass(m)
     end
 end
 
+local oldTargetSpeed = 999990
+local speedCounter = 0
+local speedAnnounced = 999999
+local callSpeed = true --export:
+local callSpeedChange = true --export:
+local speedUpOrDown = ""
 function drawEnemyInfoDmgBar()
     local targetId = radar.getTargetId()
-
     if targetId == 0 or radar.isConstructIdentified(targetId) == 0 then
         enemyInfoDmg = "";
+        oldTargetSpeed = 999999
+        speedCounter = 0
+        speedAnnounced = 999999
+        speedUpOrDown = ""
     else
 
         dmgDone = dmgTable[targetId] or 0;
@@ -697,6 +706,46 @@ function drawEnemyInfoDmgBar()
         else
             speedChangeIcon = ""
         end
+
+        if callSpeed then
+            local factor = math.floor(round(targetSpeed / 5000))
+            if speedAnnounced ~= 5000 * factor and targetSpeed > 5000 * factor - 100 and
+                targetSpeed < 5000 * factor + 100 then
+                table.insert(Sound, "speed" .. 5000 * factor)
+                oldTargetSpeed = targetSpeed
+                speedAnnounced = 5000 * factor
+            end
+        end
+
+        if callSpeedChange then
+            local speedChangeLimit = 500
+            if targetSpeed - oldTargetSpeed > speedChangeLimit then
+                oldTargetSpeed = targetSpeed
+                speedCounter = 0
+                if speedUpOrDown ~= "up" then
+                    speedUpOrDown = "up"
+                    table.insert(Sound, "speedup")
+                end
+            elseif oldTargetSpeed - targetSpeed > speedChangeLimit then
+                oldTargetSpeed = targetSpeed
+                speedCounter = 0
+                if speedUpOrDown ~= "down" then
+                    speedUpOrDown = "down"
+                    table.insert(Sound, "speeddown")
+                end
+            else
+                if speedCounter < 100 then
+                    speedCounter = speedCounter + 1
+                else
+                    if speedUpOrDown ~= "holding" then
+                        speedUpOrDown = "holding"
+                        table.insert(Sound, "speedholding")
+                    end
+                    speedCounter = 0
+                end
+            end
+        end
+
 
         if targetDistance > oldTargetDistance then
             distanceChangeIcon = "↑"

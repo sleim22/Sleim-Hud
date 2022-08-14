@@ -208,8 +208,18 @@ function drawFuelInfo()
 			percent = 0
 			color = "red"
 		elseif percent < 15 then
+			if not fuelCritical then
+				fuelCritical = true
+				table.insert(Sound, "fuel15")
+			end
+
 			color = "red"
 		elseif percent < 50 then
+			if not fuelLow then
+				fuelLow = true
+				table.insert(Sound, "fuel50")
+			end
+
 			color = "orange"
 		end
 		return [[
@@ -612,6 +622,17 @@ stressBarHeight = "5"
 function drawShield()
 	shieldHp = shield.getShieldHitpoints()
 	shieldPercent = shieldHp / shieldMax * 100
+	if shieldPercent < 15 then
+		if not shieldCritical then
+			shieldCritical = true
+			table.insert(Sound, "shield15")
+		end
+	elseif shieldPercent < 50 then
+		if not shieldLow then
+			shieldLow = true
+			table.insert(Sound, "shield50")
+		end
+	end
 	if shieldPercent == 100 then shieldPercent = "100"
 	else
 		shieldPercent = string.format('%0.2f', shieldPercent)
@@ -730,6 +751,18 @@ function combineHudElements()
 		planetAR .. fuelHtml .. brakeHtml .. speedHtml .. pipeInfoHtml .. ShieldDisplay.HTML .. healthHtml .. mouseHtml)
 end
 
+-- remote triggers
+fuelLow = false
+fuelCritical = false
+shieldLow = false
+shieldCritical = false
+Sound = {}
+function play(path)
+	system.playSound("SleimHud/" .. path .. ".mp3")
+end
+
+table.insert(Sound, "greetings")
+unit.setTimer("sound", 1)
 unit.setTimer("hud", 0.1)
 system.showScreen(1)
 if switch_1 ~= nil then switch_1.activate() end
