@@ -147,8 +147,8 @@ function printNewRadarContacts()
             elseif radar.isConstructAbandoned(v) == 1 then
                 newTargetName = newTargetName .. " - Abandoned"
             else
-                system.playSound("contact.mp3")
                 if not borderActive then
+                    play("newContact")
                     borderActive = true
                     borderColor = "red"
                     borderWidth = 200
@@ -718,7 +718,7 @@ function drawEnemyInfoDmgBar()
         end
 
         if callSpeedChange then
-            local speedChangeLimit = 1000
+            local speedChangeLimit = 500
             if targetSpeed - oldTargetSpeed > speedChangeLimit then
                 oldTargetSpeed = targetSpeed
                 speedCounter = 0
@@ -734,7 +734,7 @@ function drawEnemyInfoDmgBar()
                     table.insert(Sound, "speeddown")
                 end
             else
-                if speedCounter < 150 then
+                if speedCounter < 100 then
                     speedCounter = speedCounter + 1
                 else
                     if speedUpOrDown ~= "holding" then

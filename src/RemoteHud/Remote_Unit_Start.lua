@@ -625,12 +625,12 @@ function drawShield()
 	if shieldPercent < 15 then
 		if not shieldCritical then
 			shieldCritical = true
-			table.insert(Sound, "shieldCritical")
+			table.insert(Sound, "shield15")
 		end
 	elseif shieldPercent < 50 then
 		if not shieldLow then
 			shieldLow = true
-			table.insert(Sound, "shieldLow")
+			table.insert(Sound, "shield50")
 		end
 	end
 	if shieldPercent == 100 then shieldPercent = "100"
