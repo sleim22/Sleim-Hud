@@ -1,19 +1,37 @@
-# SleimGunnerHud
+# SleimGunnerHUD
 Gunner Hud to provide useful information in 3rd person view
+![vlcsnap-2022-08-20-00h43m18s074](https://user-images.githubusercontent.com/41690269/185805311-6fa58eec-17f0-4b03-b687-9355ded28cea.png)
 
 ## Features:
 - Weapon Widgets Groups
-- Target Info Widget:
+- Info about selected Target:
 	- Hitchance
 	- Speed
 	- Distance
+	- Dmg done
+	- Own DPS
+	- Estimated time to 10mil dmg (L-Shield)
 - Radar with enemy and friendly filter
 	- 3 Letter easy Identification
 	- 'Alt+C' to toggle Radar widget (Enemey/Friendly)
-- Info about shield status and CCS if shield is down/off
+- 3 Letter search for targets in lua chat displayed in seperate Radar-Widget
+- Mini-Shield-Screen:
+	- Clickable to adjust and set resistances
+	- Enemy-DPS
+	- Estimated time till own shield is down
 - Detailed Info about allies (ships with same transponder tag) and Threats
-- Info on new Radar contacts
+- Info about new Radar contacts
 - Own Id, 3 Letter + ShipName displayed
+- Augmented-Reality:
+	- toggle with 'L-Shift'
+	- Planets
+	- Alien-Cores
+	- Allies with owner
+	- custom waypoints
+- 'Drift'-Mode:
+	- Alt + G to toglle
+	- disables inertia dampening to keep turning
+- custom voice pack
 
 ## How to install:
 1. Download the 'SleimGunnerHUD.conf' and 'SleimRemoteHud.conf' file
@@ -37,5 +55,6 @@ Gunner Hud to provide useful information in 3rd person view
 - LShift to toggle AR display
 - Alt + G to start/stop drift mode (disable inertia dampening)
 - Alt + C switch radar widget friendly/enemy mode
+- Alt + 5 activates AutoTargets, required Heartbeats external program
 
 
