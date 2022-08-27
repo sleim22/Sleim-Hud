@@ -96,7 +96,7 @@ function WeaponWidgetCreate()
     if type(weapon) == 'table' and #weapon > 0 then
         local WeaponPanaelIdList = {}
         for i = 1, #weapon do
-            if i % 2 ~= 0 then
+            if (#weapon == 6 and i == 4 or i == 1) or (#weapon < 6 and i % 2 ~= 0) then
                 table.insert(WeaponPanaelIdList, system.createWidgetPanel(''))
             end
             local WeaponWidgetDataId = weapon[i].getWidgetDataId()
