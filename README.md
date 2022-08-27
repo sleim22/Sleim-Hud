@@ -6,7 +6,7 @@
 - Weapon Widgets Groups
 - Radar with enemy and friendly filter
 	- 3 Letter easy Identification
-	- 'Alt+C' to toggle Radar widget (Enemey/Friendly)
+	- 'Alt+C' to toggle Radar widget (Enemy/Friendly)
 - 3 Letter search for targets in lua chat displayed in seperate Radar-Widget
 
 ![weapon_radar](https://user-images.githubusercontent.com/41690269/187029911-d8237fc8-4b73-4830-a33d-e78e1441b7b8.png)
