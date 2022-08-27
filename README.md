@@ -9,8 +9,7 @@
 	- 'Alt+C' to toggle Radar widget (Enemy/Friendly)
 - 3 Letter search for targets in lua chat displayed in seperate Radar-Widget
 
-![weapon_radar](https://user-images.githubusercontent.com/41690269/187029911-d8237fc8-4b73-4830-a33d-e78e1441b7b8.png)
-
+![weapon_radar](https://user-images.githubusercontent.com/41690269/187030297-9db214a7-32d6-4493-be6a-f247b36d3b44.png)
 
 - Info about selected Target:
 	- Hitchance
@@ -20,7 +19,7 @@
 	- Own DPS
 	- Estimated time to 10mil dmg (L-Shield)
 
-![damage_info](https://user-images.githubusercontent.com/41690269/187029845-d1d98159-3a41-4a32-b641-5c234b8ffc3f.png)
+![damage_info](https://user-images.githubusercontent.com/41690269/187030310-8ae594b2-fcea-4186-9ff2-52ecf298f8bd.png)
 
 
 - Mini-Shield-Screen:
@@ -28,7 +27,7 @@
 	- Enemy-DPS
 	- Estimated time till own shield is down
 
-![shield_screen](https://user-images.githubusercontent.com/41690269/187029945-6769c270-c482-4924-99a8-3a0673ac600a.png)
+![shield_screen](https://user-images.githubusercontent.com/41690269/187030315-2ac13fe8-50d7-45ed-8d59-2a5f9a737e2a.png)
 
 
 - Detailed Info about allies (ships with same transponder tag) and Threats
