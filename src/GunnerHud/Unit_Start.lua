@@ -107,7 +107,7 @@ function WeaponWidgetCreate()
     end
 end
 
-if showWeapons == true then
+if showWeapons then
     WeaponWidgetCreate()
 end
 
@@ -656,9 +656,8 @@ end
 
 function getMaxSpeedByMass(m)
     if m then
-        m = m / 1000
-        local speed = 50376.8 - 62.5683 * m + 0.0659543 * m ^ 2 - 0.000036692 * m ^ 3 + 7.8824910 ^ -9 * m ^ 4
-
+        local speed = 50000 / 3.6 - 10713 * (m - 10000) / (853926 + (m - 10000))
+        speed = speed * 3.6
         if speed > 50000 then
             speed = 50000
         elseif speed < 20000 then
@@ -668,9 +667,9 @@ function getMaxSpeedByMass(m)
     end
 end
 
-local oldTargetSpeed = 999990
+local oldTargetSpeed = nil
 local speedCounter = 0
-local speedAnnounced = 999999
+local speedAnnounced = nil
 local callSpeed = true --export:
 local callSpeedChange = true --export:
 local speedUpOrDown = ""
@@ -678,9 +677,9 @@ function drawEnemyInfoDmgBar()
     local targetId = radar.getTargetId()
     if targetId == 0 or radar.isConstructIdentified(targetId) == 0 then
         enemyInfoDmg = "";
-        oldTargetSpeed = 999999
+        oldTargetSpeed = nil
         speedCounter = 0
-        speedAnnounced = 999999
+        speedAnnounced = nil
         speedUpOrDown = ""
     else
 
@@ -707,8 +706,10 @@ function drawEnemyInfoDmgBar()
             speedChangeIcon = ""
         end
 
+        if not oldTargetSpeed then oldTargetSpeed = targetSpeed end
         if callSpeed then
             local factor = math.floor(round(targetSpeed / 5000))
+            if not speedAnnounced then speedAnnounced = 5000 * factor end
             if speedAnnounced ~= 5000 * factor and targetSpeed > 5000 * factor - 100 and
                 targetSpeed < 5000 * factor + 100 then
                 table.insert(Sound, "speed" .. 5000 * factor)
