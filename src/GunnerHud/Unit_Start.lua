@@ -1,35 +1,38 @@
-showWeapons = true --export: Shows Weapon Widgets in 3rd person
-showShield = true --export: shows Shield Status
-showAllies = true --export: adds info about allies
-showThreats = true --export: adds info about Threats
-printSZContacts = false --export: print new Contacs in Safezone, default off
+showWeapons            = true --export: Shows Weapon Widgets in 3rd person
+showShield             = true --export: shows Shield Status
+showAllies             = true --export: adds info about allies
+showThreats            = true --export: adds info about Threats
+printSZContacts        = false --export: print new Contacs in Safezone, default off
 printLocationOnContact = true --export: print own location on new target
-showTime = true --export: Shows Time when new Targets enter radar range or leave
-maxAllies = 10 --export: max Amount for detailed info about Allies, reduce if overlapping with threat info
-tempRadarTime = 200 --export: temporary Radar time in seconds until it gets destroyed
-probil = 0
-targetSpeed = 0
-oldSpeed = 0
-targetDistance = 0
-oldTargetDistance = 0
-targetName = "TargetInfo"
-speedChangeIcon = ""
-distanceChangeIcon = ""
-maxCoreStress = core.getMaxCoreStress()
-venting = ""
-stressBarHeight = "5"
-newRadarContacts = {}
-newRadarCounter = 0
-newTargetId = 0
-healthHtml = ""
-alliesHtml = ""
-threatsHtml = ""
-html = ""
-allies = {}
-threats = {}
-zone = construct.isInPvPZone()
-
-radar = radar_1
+showTime               = true --export: Shows Time when new Targets enter radar range or leave
+maxAllies              = 10 --export: max Amount for detailed info about Allies, reduce if overlapping with threat info
+tempRadarTime          = 200 --export: temporary Radar time in seconds until it gets destroyed
+autoTargets            = false
+lshiftPressed          = false
+probil                 = 0
+targetSpeed            = 0
+oldSpeed               = 0
+targetDistance         = 0
+oldTargetDistance      = 0
+targetName             = "TargetInfo"
+speedChangeIcon        = ""
+distanceChangeIcon     = ""
+maxCoreStress          = core.getMaxCoreStress()
+venting                = ""
+stressBarHeight        = "5"
+newRadarContacts       = {}
+newRadarCounter        = 0
+newTargetId            = 0
+healthHtml             = ""
+alliesHtml             = ""
+threatsHtml            = ""
+html                   = ""
+allies                 = {}
+threats                = {}
+zone                   = construct.isInPvPZone()
+radar                  = radar_1
+screenHeight           = system.getScreenHeight()
+screenWidth            = system.getScreenWidth()
 if radar_size == 0 then
     system.print("Connect a space radar and run config again!")
     unit.exit()
@@ -113,13 +116,11 @@ end
 
 function getFriendlyDetails(id)
     owner = radar.getConstructOwnerEntity(id)
-    if owner.id and owner.isOrganization then
+    if owner.isOrganization then
         return system.getOrganization(owner.id).name
-    end
-    if owner.id and not owner.isOrganization then
+    else
         return system.getPlayerName(owner.id)
     end
-    return ""
 end
 
 function printNewRadarContacts()
@@ -136,7 +137,7 @@ function printNewRadarContacts()
             if showTime then
                 newTargetName = newTargetName .. ' - Time: ' .. seconds_to_clock(system.getArkTime())
             end
-            if radar and radar.hasMatchingTransponder(v) == 1 then
+            if radar.hasMatchingTransponder(v) == 1 then
                 newTargetName = newTargetName .. " - [Ally] Owner: " .. getFriendlyDetails(v)
                 if not borderActive then
                     borderColor = "green"
@@ -147,6 +148,7 @@ function printNewRadarContacts()
             elseif radar.isConstructAbandoned(v) == 1 then
                 newTargetName = newTargetName .. " - Abandoned"
             else
+
                 if not borderActive then
                     play("newContact")
                     borderActive = true
@@ -261,7 +263,7 @@ function drawShield()
         stressBarHeight = "15"
         venting = "Venting "
         healthHtml = coreStressBar .. shieldHealthBar
-    elseif shield_1.getState() == 0 or shield_1.getShieldHitpoints() == 0 then
+    elseif shield_1.isActive() == 0 or shield_1.getShieldHitpoints() == 0 then
         stressBarHeight = "5"
         healthHtml = coreStressBar
     else
@@ -273,8 +275,9 @@ end
 
 requiredTargets = {}
 function readRequiredValues()
+    requiredTargets = {}
     if autoTargets then
-        requiredTargets = {}
+
         local targets = require("Targets")
         for _, v in pairs(targets) do
             local id = v.shortid[1]
@@ -299,7 +302,7 @@ function readRequiredValues()
 end
 
 if pcall(require, "Transponder") and pcall(require, "Targets") and transponder then
-    unit.setTimer("loadRequired", 2)
+    unit.setTimer("loadRequired", 1)
 end
 specialRadarTargets = {}
 function updateRadar(match)
@@ -317,7 +320,7 @@ function updateRadar(match)
         for str in constructList do
             local id = tonumber(str:match('"constructId":"([%d]*)"'))
             local tagged = radar.hasMatchingTransponder(id) == 0 and true or false
-            if radar and radar.hasMatchingTransponder(id) == 1 then
+            if radar.hasMatchingTransponder(id) == 1 then
                 allies[#allies + 1] = id
             end
             if radar.getThreatRateFrom(id) > 1 then
@@ -326,6 +329,7 @@ function updateRadar(match)
             local ident = radar.isConstructIdentified(id) == 1
             local randomid = getShortName(id)
             str = string.gsub(str, 'name":"', 'name":"' .. randomid .. ' - ')
+
             if match and tagged then
                 list[#list + 1] = str
             elseif not match and not tagged then
@@ -347,7 +351,6 @@ function updateRadar(match)
                 specialRadar = true
                 specialTargetRadar()
             end
-
         end
         return '{"constructsList":[' .. table.concat(list, ',') .. '],' .. data:match('"elementId":".+')
     end
@@ -413,7 +416,7 @@ function alliesHead()
         return ""
     else
         local alliesHead = [[<tr>
-                      <th style="width:max-content;max-width:80%">ShipInfo</th>
+                    <th style="width:max-content;max-width:80%">ShipInfo</th>
                       <th style="width:max-content;max-width:30%">Owner</th>
                     </tr>]]
         return alliesHead
@@ -442,7 +445,7 @@ function drawThreatsHtml()
             local threatsHead = [[
                             <tr>
                                 <th style="width:max-content;max-width:80%">ShipInfo</th>
-                                <th style="width:max-content;max-width:30%">Threat Lvl</th>
+                                <th style="width:max-content;max-width:50%">Threat Lvl</th>
                             </tr>]]
             return threatsHead
         end
@@ -555,7 +558,7 @@ borderColor = "red"
 borderActive = false
 function alarmBorder()
     alarmStyles = [[<style>
-                   .alarmBorder {
+                .alarmBorder {
                     width:100%;
                     height:100%;
                     box-shadow: 0 0 ]] .. borderWidth .. [[px 0px ]] .. borderColor .. [[ inset;
@@ -670,94 +673,99 @@ end
 local oldTargetSpeed = nil
 local speedCounter = 0
 local speedAnnounced = nil
+local speedUpOrDown = ""
 local callSpeed = true --export:
 local callSpeedChange = true --export:
-local speedUpOrDown = ""
+local speedChange = ""
 function drawEnemyInfoDmgBar()
     local targetId = radar.getTargetId()
+
     if targetId == 0 or radar.isConstructIdentified(targetId) == 0 then
         enemyInfoDmg = "";
         oldTargetSpeed = nil
         speedCounter = 0
         speedAnnounced = nil
         speedUpOrDown = ""
+        speedChange = ""
     else
 
-        dmgDone = dmgTable[targetId] or 0;
-        dmgPercent = (dmgDone / 100000)
-        if dmgPercent > 100 then dmgPercent = 100 end
-        if dmgDone > 1000000 then
-            dmgDoneFormatted = string.format('%0.2f', (dmgDone / 1000000)) .. "M"
-        elseif dmgDone > 1000 then
-            dmgDoneFormatted = string.format('%0.2f', (dmgDone / 1000)) .. "k"
-        else
-            dmgDoneFormatted = "0"
-        end
-        targetDistance = math.floor(radar.getConstructDistance(targetId))
-        targetName = "[" ..
-            radar.getConstructCoreSize(targetId) .. "]-" ..
-            getShortName(targetId) .. "- " .. radar.getConstructName(targetId)
-        targetSpeed = math.floor(radar.getConstructSpeed(targetId) * 3.6)
-        if targetSpeed > oldSpeed then
-            speedChangeIcon = "↑"
-        elseif targetSpeed < oldSpeed then
-            speedChangeIcon = "↓"
-        else
-            speedChangeIcon = ""
-        end
-
-        if not oldTargetSpeed then oldTargetSpeed = targetSpeed end
-        if callSpeed then
-            local factor = math.floor(round(targetSpeed / 5000))
-            if not speedAnnounced then speedAnnounced = 5000 * factor end
-            if speedAnnounced ~= 5000 * factor and targetSpeed > 5000 * factor - 100 and
-                targetSpeed < 5000 * factor + 100 then
-                table.insert(Sound, "speed" .. 5000 * factor)
-                oldTargetSpeed = targetSpeed
-                speedAnnounced = 5000 * factor
-            end
-        end
-
-        if callSpeedChange then
-            local speedChangeLimit = 500
-            if targetSpeed - oldTargetSpeed > speedChangeLimit then
-                oldTargetSpeed = targetSpeed
-                speedCounter = 0
-                if speedUpOrDown ~= "up" then
-                    speedUpOrDown = "up"
-                    table.insert(Sound, "speedup")
-                end
-            elseif oldTargetSpeed - targetSpeed > speedChangeLimit then
-                oldTargetSpeed = targetSpeed
-                speedCounter = 0
-                if speedUpOrDown ~= "down" then
-                    speedUpOrDown = "down"
-                    table.insert(Sound, "speeddown")
-                end
+        if radar.isConstructIdentified(targetId) == 1 then
+            dmgDone = dmgTable[targetId] or 0;
+            dmgPercent = (dmgDone / 100000)
+            if dmgPercent > 100 then dmgPercent = 100 end
+            if dmgDone > 1000000 then
+                dmgDoneFormatted = string.format('%0.2f', (dmgDone / 1000000)) .. "M"
+            elseif dmgDone > 1000 then
+                dmgDoneFormatted = string.format('%0.2f', (dmgDone / 1000)) .. "k"
             else
-                if speedCounter < 100 then
-                    speedCounter = speedCounter + 1
-                else
-                    if speedUpOrDown ~= "holding" then
-                        speedUpOrDown = "holding"
-                        table.insert(Sound, "speedholding")
-                    end
-                    speedCounter = 0
+                dmgDoneFormatted = "0"
+            end
+            targetDistance = math.floor(radar.getConstructDistance(targetId))
+            targetName = "[" ..
+                radar.getConstructCoreSize(targetId) .. "]-" ..
+                getShortName(targetId) .. "- " .. radar.getConstructName(targetId)
+            targetSpeed = math.floor(radar.getConstructSpeed(targetId) * 3.6)
+            if targetSpeed > oldSpeed then
+                speedChangeIcon = "↑"
+            elseif targetSpeed < oldSpeed then
+                speedChangeIcon = "↓"
+            else
+                speedChangeIcon = ""
+            end
+            if not oldTargetSpeed then oldTargetSpeed = targetSpeed end
+            if callSpeed then
+                local factor = math.floor(round(targetSpeed / 5000))
+                if not speedAnnounced then speedAnnounced = 5000 * factor end
+                if speedAnnounced ~= 5000 * factor and targetSpeed > 5000 * factor - 100 and
+                    targetSpeed < 5000 * factor + 100 then
+                    table.insert(Sound, "speed" .. 5000 * factor)
+                    oldTargetSpeed = targetSpeed
+                    speedAnnounced = 5000 * factor
                 end
             end
+
+            if callSpeedChange then
+                local speedChangeLimit = 500
+                if targetSpeed - oldTargetSpeed > speedChangeLimit then
+                    oldTargetSpeed = targetSpeed
+                    speedCounter = 0
+                    if speedUpOrDown ~= "up" then
+                        speedUpOrDown = "up"
+                        speedChange = "Increasing"
+                        table.insert(Sound, "speedup")
+                    end
+                elseif oldTargetSpeed - targetSpeed > speedChangeLimit then
+                    oldTargetSpeed = targetSpeed
+                    speedCounter = 0
+                    if speedUpOrDown ~= "down" then
+                        speedUpOrDown = "down"
+                        speedChange = "Braking"
+                        table.insert(Sound, "speeddown")
+                    end
+                else
+                    if speedCounter < 100 then
+                        speedCounter = speedCounter + 1
+                    else
+                        if speedUpOrDown ~= "holding" then
+                            speedUpOrDown = "holding"
+                            speedChange = "Holding"
+                            table.insert(Sound, "speedholding")
+                        end
+                        speedCounter = 0
+                    end
+                end
+            end
+
+            if targetDistance > oldTargetDistance then
+                distanceChangeIcon = "↑"
+            elseif targetDistance < oldTargetDistance then
+                distanceChangeIcon = "↓"
+            else
+                distanceChangeIcon = ""
+            end
+            oldTargetDistance = targetDistance
+            oldSpeed = targetSpeed
         end
-
-
-        if targetDistance > oldTargetDistance then
-            distanceChangeIcon = "↑"
-        elseif targetDistance < oldTargetDistance then
-            distanceChangeIcon = "↓"
-        else
-            distanceChangeIcon = ""
-        end
-        oldTargetDistance = targetDistance
-        oldSpeed = targetSpeed
-
         if targetDistance < 1000 then
             distanceUnit = "m"
         elseif targetDistance < 100000 then
@@ -768,7 +776,7 @@ function drawEnemyInfoDmgBar()
             distanceUnit = "su"
         end
         local maxSpeed = comma_value(math.floor(getMaxSpeedByMass(radar.getConstructMass(targetId))))
-        probil = round(weapon_1.getHitProbability(), 4) * 100
+        probil = math.floor(json.decode(weapon_1.getWidgetData()).properties.hitProbability * 100)
         enemyInfoDmg = [[<style>
                         .enemyInfoCss {
                             position: fixed;
@@ -802,8 +810,13 @@ function drawEnemyInfoDmgBar()
                     
                         table.dmgBar td {
                             width: 110px;
+                        }.enemySpeed{
+                            position: fixed;
+                            top: 50%;
+                            left: 35%;
                         }
-                    </style>
+                    </style><div class="enemySpeed">Speed: ]] .. comma_value(targetSpeed) .. [[km/h <br>]]
+            .. speedChange .. [[</div>
                     <div class="enemyInfoCss">
                         <table class="dmgBar">
                             <tr>
@@ -857,8 +870,6 @@ function drawEnemyInfoDmgBar()
     end
 end
 
-screenHeight = system.getScreenHeight()
-screenWidth = system.getScreenWidth()
 function crossHair()
     local l = targetDistance
     if l < 100000 then l = 100000 end
@@ -879,6 +890,8 @@ end
 
 alliesAR = ""
 function drawAlliesOnScreen()
+    screenHeight = system.getScreenHeight()
+    screenWidth = system.getScreenWidth()
     if lshiftPressed then
         alliesAR = [[<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">]]
         for _, v in ipairs(allies) do
@@ -992,7 +1005,7 @@ aliencores = { [1] = {
 
 alienAR = ""
 function drawAlienCores()
-    if lshiftPressed then
+    if false and lshiftPressed then
         alienAR = ""
         for _, v in pairs(aliencores) do
             local point = vec3(v.pos)
@@ -1004,19 +1017,19 @@ function drawAlienCores()
                 alienAR = alienAR ..
                     [[<div style="position: fixed;left: ]] ..
                     xP .. [[px;top:]] .. yP .. [[px;"><svg height="30" width="15">
-                                <g>
-                                    <path style="fill:purple;" d="M8.472,0l-1.28,0.003c-2.02,0.256-3.679,1.104-4.671,2.386C1.685,3.47,1.36,4.78,1.553,6.283
-                                        c0.37,2.87,2.773,6.848,4.674,8.486c0.475,0.41,1.081,0.794,1.353,0.899c0.129,0.044,0.224,0.073,0.333,0.073
-                                        c0.11,0,0.217-0.031,0.319-0.091c1.234-0.603,2.438-1.88,3.788-4.02c0.936-1.485,2.032-3.454,2.2-5.495
-                                        C14.492,2.843,12.295,0.492,8.472,0z M8.435,0.69c3.431,0.447,5.337,2.462,5.097,5.391c-0.156,1.913-1.271,3.875-2.097,5.182
-                                        c-1.278,2.027-2.395,3.226-3.521,3.777c-0.005,0.002-0.009,0.004-0.012,0.005c-0.029-0.006-0.068-0.021-0.087-0.027
-                                        c-0.149-0.057-0.706-0.401-1.135-0.771c-1.771-1.525-4.095-5.375-4.44-8.052C2.07,4.879,2.348,3.741,3.068,2.812
-                                        c0.878-1.135,2.363-1.889,4.168-2.12L8.435,0.69z"/>
-                                    <path style="fill:purple;" d="M3.504,6.83C3.421,6.857,3.37,6.913,3.373,7.024c0.308,1.938,1.616,3.536,3.842,3.126
-                                        C7.002,8.019,5.745,6.933,3.504,6.83z"/>
-                                    <path style="fill:purple;" d="M8.778,10.215c2.196-0.125,3.61-1.379,3.776-3.319C10.321,6.727,8.55,7.923,8.778,10.215z"/>
-                                </g>
-                            </svg>]] .. v.name .. " " .. getDistanceDisplayString(distance) .. [[</div>]]
+                                                <g>
+                                                    <path style="fill:purple;" d="M8.472,0l-1.28,0.003c-2.02,0.256-3.679,1.104-4.671,2.386C1.685,3.47,1.36,4.78,1.553,6.283
+                                                        c0.37,2.87,2.773,6.848,4.674,8.486c0.475,0.41,1.081,0.794,1.353,0.899c0.129,0.044,0.224,0.073,0.333,0.073
+                                                        c0.11,0,0.217-0.031,0.319-0.091c1.234-0.603,2.438-1.88,3.788-4.02c0.936-1.485,2.032-3.454,2.2-5.495
+                                                        C14.492,2.843,12.295,0.492,8.472,0z M8.435,0.69c3.431,0.447,5.337,2.462,5.097,5.391c-0.156,1.913-1.271,3.875-2.097,5.182
+                                                        c-1.278,2.027-2.395,3.226-3.521,3.777c-0.005,0.002-0.009,0.004-0.012,0.005c-0.029-0.006-0.068-0.021-0.087-0.027
+                                                        c-0.149-0.057-0.706-0.401-1.135-0.771c-1.771-1.525-4.095-5.375-4.44-8.052C2.07,4.879,2.348,3.741,3.068,2.812
+                                                        c0.878-1.135,2.363-1.889,4.168-2.12L8.435,0.69z"/>
+                                                    <path style="fill:purple;" d="M3.504,6.83C3.421,6.857,3.37,6.913,3.373,7.024c0.308,1.938,1.616,3.536,3.842,3.126
+                                                        C7.002,8.019,5.745,6.933,3.504,6.83z"/>
+                                                    <path style="fill:purple;" d="M8.778,10.215c2.196-0.125,3.61-1.379,3.776-3.319C10.321,6.727,8.55,7.923,8.778,10.215z"/>
+                                                </g>
+                                            </svg>]] .. v.name .. " " .. getDistanceDisplayString(distance) .. [[</div>]]
             end
         end
     else
@@ -1046,7 +1059,9 @@ function zeroConvertToWorldCoordinates(cl)
     end
     cj = math.rad(cj)
     ci = math.rad(ci)
+
     local planet = atlas[tonumber(cn)][tonumber(co)]
+
     local cp = math.cos(ci)
     local cq = vec3(cp * math.cos(cj), cp * math.sin(cj), math.sin(ci))
     return (vec3(planet.center) + (planet.radius + ch) * cq)
@@ -1061,7 +1076,6 @@ if hasCustomWaypoints then
     end
     system.print("--------------")
 end
-
 customWaypointsAR = ""
 function drawCustomWaypointsOnScreen()
     if lshiftPressed and hasCustomWaypoints then
@@ -1092,29 +1106,48 @@ function drawCustomWaypointsOnScreen()
     end
 end
 
-mouseHtml = ""
-function drawMouse()
-    if system.isViewLocked() == 1 then
-        local x = system.getMousePosX()
-        local y = system.getMousePosY()
-        mouseHtml = [[<svg  width="100%" height="100%"><circle cx=]] ..
-            x .. [[ cy=]] .. y .. [[ r=55 stroke="red" stroke-width="3" fill="red"></svg>]]
+function radarRange()
+    local radarIdentificationRange = radar.getIdentifyRanges()[1]
+    if radarIdentificationRange == nil then return "" end
+    local distanceUnit
+    if radarIdentificationRange < 1000 then
+        distanceUnit = "m"
+    elseif radarIdentificationRange < 100000 then
+        radarIdentificationRange = radarIdentificationRange / 1000
+        distanceUnit = "km"
     else
-        mouseHtml = ""
+        radarIdentificationRange = radarIdentificationRange / 200000
+        distanceUnit = "su"
     end
+    return [[<style> .radarInfo{
+                        position: fixed;
+                        top: 10px;
+                        right: 10px;
+                    }</style><div class="radarInfo">Radar-Range: ]] ..
+        round(radarIdentificationRange, 2) .. distanceUnit .. [[</div>]]
+
 end
 
 function drawHud()
     html = alarmStyles ..
-        cssAllyLocked ..
-        healthHtml .. alliesHtml .. threatsHtml .. ownInfoHtml .. enemyInfoDmg .. crossHair() ..
-        alliesAR .. mouseHtml
+        alienAR ..
+        planetAR ..
+        customWaypointsAR ..
+        alliesAR ..
+        cssAllyLocked .. healthHtml .. alliesHtml .. threatsHtml .. ownInfoHtml ..
+        enemyInfoDmg .. crossHair() .. radarRange()
     system.setScreen(html)
 end
 
 getMaxCorestress()
 system.setScreen(html)
 system.showScreen(1)
+Sound = {}
+function play(path)
+    system.playSound("SleimHud/" .. path .. ".mp3")
+end
+
+unit.setTimer("sound", 1)
 unit.setTimer("hud", 0.1)
 unit.setTimer("radar", 0.4)
 unit.setTimer("clean", 30)

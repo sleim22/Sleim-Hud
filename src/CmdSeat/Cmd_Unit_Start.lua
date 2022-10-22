@@ -734,7 +734,7 @@ aliencores = { [1] = {
 
 alienAR = ""
 function drawAlienCores()
-    if lshiftPressed then
+    if false and lshiftPressed then
         alienAR = ""
         for _, v in pairs(aliencores) do
             local point = vec3(v.pos)

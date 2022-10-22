@@ -212,14 +212,12 @@ function drawFuelInfo()
 				fuelCritical = true
 				table.insert(Sound, "fuel15")
 			end
-
 			color = "red"
 		elseif percent < 50 then
 			if not fuelLow then
 				fuelLow = true
 				table.insert(Sound, "fuel50")
 			end
-
 			color = "orange"
 		end
 		return [[
@@ -322,47 +320,48 @@ function speedInfo()
 		resString = resString .. string.format(math.floor(dis))
 		brakeText = "M"
 	end
+
 	driftInfo = ""
 	if drift then
 		driftInfo = [[<tr>
-		<td style="text-align: center;" colspan="2"><h6>Inertia-Dampening: Off</h6></td>
-	</tr>]]
+                        <td style="text-align: center;" colspan="2"><h6>Inertia-Dampening: Off</h6></td>
+                    </tr>]]
 	end
 	speedHtml = [[
-                                        <style>
-                                            h1,h6{
-                                            color: #80ffff;
-                                            }
-                                        table.speed{
-                                            position: fixed;
-                                            table-layout: fixed;
-                                            left: 60%;
-                                            bottom: 35%;
-                                            border-spacing: 0 10px;
-                                            border-collapse: separate;
-                                            }
-                                        table.speed td{
-                                            width: 110px;
-                                        }          
-                                        </style>
-                                            <table class="speed">
-                                                <tr>
-                                                    <td style="text-align: right;"><h1>]] .. throttle .. [[</h1></td>
-                                                    <td>%</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="text-align: right;"><h1>]] .. speed .. [[</h1></td>
-                                                    <td>km/h <h6>(max ]] .. maxSpeed .. [[)</h6></td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="text-align: right;"><h1>]] .. accel .. [[</h1></td>
-                                                    <td>g</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="text-align: right;"><h1>]] .. resString .. [[</h1></td>
-                                                    <td>]] .. brakeText .. [[ Brake-Dist</td>
-                                                </tr>]] .. driftInfo .. [[
-                                            </table>]]
+                    <style>
+                        h1,h6{
+                        color: #80ffff;
+                        }
+                    table.speed{
+                        position: fixed;
+                        table-layout: fixed;
+                        left: 60%;
+                        bottom: 35%;
+                        border-spacing: 0 10px;
+                        border-collapse: separate;
+                        }
+                    table.speed td{
+                        width: 110px;
+                    }          
+                    </style>
+                        <table class="speed">
+                            <tr>
+                                <td style="text-align: right;"><h1>]] .. throttle .. [[</h1></td>
+                                <td>%</td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right;"><h1>]] .. speed .. [[</h1></td>
+                                <td>km/h <h6>(max ]] .. maxSpeed .. [[)</h6></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right;"><h1>]] .. accel .. [[</h1></td>
+                                <td>g</td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right;"><h1>]] .. resString .. [[</h1></td>
+                                <td>]] .. brakeText .. [[ Brake-Dist</td>
+                            </tr>]] .. driftInfo .. [[
+                        </table>]]
 end
 
 counter = 1
@@ -376,7 +375,6 @@ adjustShield = false
 autoAdjustShield = false --export: NOT RECOMMENDED! Will audo adjust every minute based on current stress
 shieldDownColor = ""
 ShieldRes = {}
-ShieldDisplay = {}
 function enemyDPS()
 	local incDmg = 0
 	local newShield = shield.getShieldHitpoints()
@@ -435,13 +433,13 @@ function autoAdjust()
 end
 
 function drawEnemyDPS()
+	local resistances = shield.getResistances()
 	local resCd = math.floor(shield.getResistancesCooldown())
 	local ventCd = math.floor(shield.getVentingCooldown())
 
 	local sRR = shield.getStressRatioRaw()
 
-
-
+	ShieldDisplay = {}
 	screenHeight = system.getScreenHeight()
 	screenWidth = system.getScreenWidth()
 	ShieldDisplay.startX = screenWidth * 0.17
@@ -480,9 +478,9 @@ function drawEnemyDPS()
 	if (calculating and shield.isActive() == 1) or shield.isVenting() == 1 or ventCd > 0 or leftAltPressed or resCd > 0 then
 		ShieldDisplay.HTML = [[
 
- <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;fill:white;stroke:#80ffff;font-weight:bold">
+                <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;fill:white;stroke:#80ffff;font-weight:bold">
 
-	<rect x="]] ..
+                    <rect x="]] ..
 			ShieldDisplay.startX ..
 			[[" y="]] ..
 			ShieldDisplay.startY ..
@@ -490,30 +488,30 @@ function drawEnemyDPS()
 			ShieldDisplay.totalWidth ..
 			[[" height="]] .. ShieldDisplay.totalHeight .. [[" style="stroke-width:2;fill-opacity:0"/>
 
-	<text x="]] ..
+                    <text x="]] ..
 			ShieldDisplay.startX + 30 ..
 			[[" y="]] .. ShieldDisplay.startY + ShieldDisplay.textMargin .. [[">Enemy DPS: ]] .. dps .. [[</text>
-	<text x="]] ..
+                    <text x="]] ..
 			ShieldDisplay.startX + 30 ..
 			[[" y="]] ..
 			ShieldDisplay.startY + ShieldDisplay.textMargin * 2 ..
 			[[" fill="]] .. shieldDownColor .. [[">Time till shield down: ]] .. ttZString .. [[</text>
-        <line x1="]] ..
+                        <line x1="]] ..
 			ShieldDisplay.startX + 10 ..
 			[[" y1="]] ..
 			ShieldDisplay.startY + ShieldDisplay.barMargin * 2 ..
 			[[" x2="]] ..
 			ShieldDisplay.startX + ShieldDisplay.totalWidth - 10 ..
 			[[" y2="]] .. ShieldDisplay.startY + ShieldDisplay.barMargin * 2 .. [[" style="stroke-width:2" />
-	
-	<text x="]] ..
+                    
+                    <text x="]] ..
 			ShieldDisplay.startX + 30 ..
 			[[" y="]] ..
 			ShieldDisplay.startY + ShieldDisplay.barMargin * 3 ..
 			[[">Points left: ]] .. math.floor(ShieldRes.currentPool * 100) ..
 			"/" .. math.floor(ShieldRes.maxPool * 100) .. [[</text>
 
-	]]
+                    ]]
 
 		for i = 1, 4, 1 do
 			ShieldDisplay.HTML = ShieldDisplay.HTML ..
@@ -522,77 +520,77 @@ function drawEnemyDPS()
 				[[" y="]] ..
 				ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * i + 8 ..
 				[[" font-weight:"lighter" font-size="10">]] .. ShieldRes[i][2] .. [[</text>
-		<rect x="]] ..
+                        <rect x="]] ..
 				ShieldDisplay.startX + 30 ..
 				[[" y="]] ..
 				ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * i ..
 				[[" rx="2" ry="2" width="]] ..
 				ShieldDisplay.resBarWidth * ShieldRes[i][1] / ShieldRes.maxPool ..
 				[[" height="10" style="stroke-width:0;fill-opacity:0.8;fill:white" />
-		<rect x="]] ..
+                        <rect x="]] ..
 				ShieldDisplay.startX + 30 ..
 				[[" y="]] ..
 				ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * i ..
 				[[" rx="2" ry="2" width="]] .. ShieldDisplay.resBarWidth ..
 				[[" height="10" style="stroke-width:2;fill-opacity:0" />
-		
-		<rect x="]] ..
+                        
+                        <rect x="]] ..
 				ShieldDisplay.startX + ShieldDisplay.resBarWidth + 40 ..
 				[[" y="]] ..
 				ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * i ..
 				[[" rx="2" ry="2" width="]] ..
 				(ShieldDisplay.totalWidth - ShieldDisplay.resBarWidth - 60) * ShieldRes[i][3] ..
 				[[" height="10" style="stroke-width:0;fill-opacity:0.8;fill:red" />
-		<rect x="]] ..
+                        <rect x="]] ..
 				ShieldDisplay.startX + ShieldDisplay.resBarWidth + 40 ..
 				[[" y="]] ..
 				ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * i ..
 				[[" rx="2" ry="2" width="]] ..
 				(ShieldDisplay.totalWidth - ShieldDisplay.resBarWidth - 60) ..
 				[[" height="10" style="stroke-width:2;fill-opacity:0" />
-		
-		]]
+                        
+                        ]]
 		end
 		ShieldDisplay.HTML = ShieldDisplay.HTML .. [[
-	
-	<rect x="]] ..
+                    
+                    <rect x="]] ..
 			ShieldDisplay.startX + 30 * ShieldDisplay.resFactorX ..
 			[[" y="]] ..
 			ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 5 ..
 			[[" rx="4" ry="4" width="]] ..
 			50 * ShieldDisplay.resFactorX .. [[" height="40" style="fill:yellow;stroke-width:2;fill-opacity:0" />
-	<text x="]] ..
+                    <text x="]] ..
 			ShieldDisplay.startX + 45 * ShieldDisplay.resFactorX ..
 			[[" y="]] ..
 			ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 6 ..
 			[[" style="font-weight:bold">]] .. ShieldDisplay.setString .. [[</text>
-	
-        <rect x="]] ..
+                    
+                        <rect x="]] ..
 			ShieldDisplay.startX + 90 * ShieldDisplay.resFactorX ..
 			[[" y="]] ..
 			ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 5 ..
 			[[" rx="4" ry="4" width="]] ..
 			50 * ShieldDisplay.resFactorX .. [[" height="40" style="fill:yellow;stroke-width:2;fill-opacity:0" />
-	    <text x="]] ..
+                        <text x="]] ..
 			ShieldDisplay.startX + 98 * ShieldDisplay.resFactorX ..
 			[[" y="]] ..
 			ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 6 ..
 			[[" style="font-weight:bold">Reset</text>
-	
-     <rect x="]] ..
+                    
+                    <rect x="]] ..
 			ShieldDisplay.startX + ShieldDisplay.resBarWidth + ShieldDisplay.textMargin * 2 ..
 			[[" y="]] ..
 			ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 5 ..
 			[[" rx="4" ry="4" width="]] ..
 			(ShieldDisplay.totalWidth - ShieldDisplay.resBarWidth - 60) ..
 			[[" height="40" style="fill:yellow;stroke-width:2;fill-opacity:0" />
-	<text x="]] ..
+                    <text x="]] ..
 			ShieldDisplay.startX + ShieldDisplay.resBarWidth + ShieldDisplay.textMargin * 3 ..
 			[[" y="]] ..
 			ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 6 ..
 			[[" style="font-weight:bold">]] .. ShieldDisplay.ventString .. [[</text>
-	
-	</svg>]]
+                    
+                    </svg>]]
 
 	else
 		ShieldDisplay.HTML = ""
@@ -742,13 +740,12 @@ end
 function combineHudElements()
 	drawFuelInfo()
 	brakeHud()
+	drawMouse()
 	speedInfo()
 	drawPipeInfo()
 	drawEnemyDPS()
 	drawShield()
-	drawMouse()
-	system.setScreen(alienAR ..
-		planetAR .. fuelHtml .. brakeHtml .. speedHtml .. pipeInfoHtml .. ShieldDisplay.HTML .. healthHtml .. mouseHtml)
+	system.setScreen(fuelHtml .. brakeHtml .. speedHtml .. pipeInfoHtml .. ShieldDisplay.HTML .. healthHtml .. mouseHtml)
 end
 
 -- remote triggers
