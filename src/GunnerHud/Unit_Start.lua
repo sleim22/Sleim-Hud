@@ -584,6 +584,7 @@ local dmgDoneFormatted = "0";
 local dmgPercent = 0;
 
 function addDmgToTable(id, dmg)
+    system.print(radar.getConstructName(id) .. " hit for " .. comma_value(dmg) .. " damage")
     if not calculating then
         calculating = true
         unit.setTimer("DPS", 1)
@@ -1126,6 +1127,10 @@ function radarRange()
                     }</style><div class="radarInfo">Radar-Range: ]] ..
         round(radarIdentificationRange, 2) .. distanceUnit .. [[</div>]]
 
+end
+
+function printMiss(id)
+    system.print("Missed " .. radar.getConstructName(id))
 end
 
 function drawHud()
