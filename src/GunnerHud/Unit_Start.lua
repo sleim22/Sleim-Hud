@@ -1133,6 +1133,46 @@ function printMiss(id)
     system.print("Missed " .. radar.getConstructName(id))
 end
 
+targetVektorPointInfront = 50 --export:
+targetVektorFromTarget = {}
+function calculateVektor()
+    local P = targetVektorFromTarget[1]
+    local Q = targetVektorFromTarget[2]
+    local abstand = P:dist(Q)
+    --system.print(abstand)
+    local meter = 200000 * targetVektorPointInfront
+    local lambda = meter / abstand
+    local richtungsVerktor = Q - P
+    local R = P + lambda * richtungsVerktor
+    setCalculatedWaypoint(R)
+end
+
+function getPointFromTarget()
+    local targetId = radar.getTargetId()
+    if targetId == 0 or radar.isConstructIdentified(targetId) == 0 then
+        system.print("No target")
+        return
+    end
+    local l = targetDistance
+    local targetPos = vec3(construct.getWorldPosition()) + l * vec3(construct.getWorldForward())
+    addPoint(targetPos)
+end
+
+function addPoint(point)
+    table.insert(targetVektorFromTarget, point)
+    if (#targetVektorFromTarget == 2) then
+        system.print("Target Vektor Point 2 added")
+        calculateVektor()
+        targetVektorFromTarget = {}
+    else
+        system.print("Target Vektor Point 1 added")
+    end
+end
+
+function setCalculatedWaypoint(waypoint)
+    system.setWaypoint("::pos{0,0," .. waypoint.x .. "," .. waypoint.y .. "," .. waypoint.z .. "}")
+end
+
 function drawHud()
     html = alarmStyles ..
         alienAR ..
