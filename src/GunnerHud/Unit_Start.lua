@@ -583,8 +583,21 @@ local dmgDone = 0;
 local dmgDoneFormatted = "0";
 local dmgPercent = 0;
 
-function addDmgToTable(id, dmg)
-    system.print(radar.getConstructName(id) .. " hit for " .. comma_value(dmg) .. " damage")
+function addDmgToTable(id, dmg, weapon)
+    local ammoId = weapon.getAmmo()
+    local ammoType = system.getItem(ammoId).displayName
+    local displayType
+    if string.find(ammoType, "Kinetic") then
+        displayType = "Kinetic"
+    elseif string.find(ammoType, "Thermic") then
+        displayType = "Thermic"
+    elseif string.find(ammoType, "Antimatter") then
+        displayType = "Antimatter"
+    elseif string.find(ammoType, "Electromagnetic") then
+        displayType = "Electromagnetic"
+    end
+    system.print(radar.getConstructName(id) ..
+        " hit for " .. string.format('%0.2f', (dmg / 1000)) .. "k damage (" .. displayType .. ")")
     if not calculating then
         calculating = true
         unit.setTimer("DPS", 1)
