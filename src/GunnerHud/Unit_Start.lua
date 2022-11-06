@@ -1162,12 +1162,12 @@ end
 
 function getPointFromTarget()
     local targetId = radar.getTargetId()
-    if targetId == 0 or radar.isConstructIdentified(targetId) == 0 then
+    if targetId == 0 then
         system.print("No target")
         return
     end
-    local l = targetDistance
-    local targetPos = vec3(construct.getWorldPosition()) + l * vec3(construct.getWorldForward())
+    local l = radar.getConstructDistance(targetId)
+    local targetPos = vec3(system.getCameraWorldPos()) + l * vec3(system.getCameraWorldForward())
     addPoint(targetPos)
 end
 
