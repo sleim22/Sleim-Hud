@@ -405,12 +405,9 @@ function enemyDPS()
     end
 
     if counter > 60 then
-        adjustShield = true
         counter = 1
     end
-    if autoAdjustShield then
-        autoAdjust()
-    end
+    autoAdjust()
     if dpmTableLenght > 10 then
         dps = incDmg / dpmTableLenght
         if counter % 5 == 0 then
@@ -436,14 +433,23 @@ function enemyDPS()
         ttZ = 0
         ttZString = "Calculating"
         calculating = false
+        waitTimer = 0
     end
 end
 
+local waitTimer = 0
 function autoAdjust()
-    if adjustShield then
-        adjustShield = false
-        local sRR = shield.getStressRatioRaw()
-        local tot = 0.5999
+    local sRR = shield.getStressRatioRaw()
+    local tot = shield.getResistancesPool()
+    local resistances = shield.getResistances()
+    local shieldCD = shield.getResistancesCooldown()
+    local diffValue = 0
+    for i = 1, 4, 1 do
+        local v = sRR[i] - resistances[i] / tot
+        diffValue = math.max(v, diffValue)
+    end
+    if diffValue > 0.6 then waitTimer = waitTimer + 1 else waitTimer = 0 end
+    if shieldCD == 0 and ((autoAdjustShield and diffValue > 0.15) or (waitTimer > 15 and diffValue > 0.6)) then
         if sRR[1] == 0.0 and sRR[2] == 0.0 and sRR[3] == 0.0 and sRR[4] == 0.0 then return end
         local setResist = shield.setResistances((tot * sRR[1]), (tot * sRR[2]), (tot * sRR[3]), (tot * sRR[4]))
     end
