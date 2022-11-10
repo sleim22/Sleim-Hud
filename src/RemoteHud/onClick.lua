@@ -78,6 +78,12 @@ if x > ShieldDisplay.startX and x < ShieldDisplay.startX + ShieldDisplay.totalWi
             end
         end
 
+        -- autoadjust
+        if x > ShieldDisplay.startX + 150 * ShieldDisplay.resFactorX and
+            x < ShieldDisplay.startX + 150 * ShieldDisplay.resFactorX + 65 * ShieldDisplay.resFactorX then
+            autoAdjustShield = not autoAdjustShield
+        end
+
         -- Vent
         if x > ShieldDisplay.startX + ShieldDisplay.resBarWidth + ShieldDisplay.textMargin * 2 and
             x <
