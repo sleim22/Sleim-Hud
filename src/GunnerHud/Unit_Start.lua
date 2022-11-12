@@ -958,6 +958,8 @@ function drawPlanetsOnScreen()
 
                 deth = 20
             end
+            local pipeDist = getPipeDistance(point)
+            local eta = getETA(distance, pipeDist, xP + deth, yP + deth)
             if xP > 0 and yP > 0 then
                 planetAR = planetAR ..
                     [[<circle cx="]] ..
@@ -968,7 +970,7 @@ function drawPlanetsOnScreen()
                     xP + deth ..
                     [[" y="]] ..
                     yP + deth .. [[" fill="#c7dcff">]] .. v.name[1] ..
-                    " " .. getDistanceDisplayString(distance) .. [[</text>]]
+                    " " .. getDistanceDisplayString(distance) .. [[</text>]] .. eta
             end
         end
         planetAR = planetAR .. "</svg>"
@@ -1101,6 +1103,8 @@ function drawCustomWaypointsOnScreen()
             local x = screenWidth * customWaypointsPosOnScreen[1]
             local y = screenHeight * customWaypointsPosOnScreen[2]
             local color = v.color or "red"
+            local pipeDist = getPipeDistance(point)
+            local eta = getETA(distance, pipeDist, x, y)
             if x > 0 and y > 0 then
                 customWaypointsAR = customWaypointsAR ..
                     [[<rect x="]] ..
@@ -1111,13 +1115,38 @@ function drawCustomWaypointsOnScreen()
                     color .. [[" width="10" height="10" stroke-width="2" style="fill-opacity:0" /><text x="]] ..
                     x + 10 ..
                     [[" y="]] ..
-                    y + 10 .. [[" fill="white">]] .. v.name .. " " .. getDistanceDisplayString(distance) .. [[</text>]]
+                    y + 10 ..
+                    [[" fill="white">]] .. v.name .. " " .. getDistanceDisplayString(distance) .. [[</text>]] .. eta
             end
         end
         customWaypointsAR = customWaypointsAR .. "</svg>"
     else
         customWaypointsAR = ""
     end
+end
+
+function getPipeDistance(worldPos)
+    local origin = vec3(construct.getWorldPosition())
+    local destination = origin + vec3(construct.getWorldVelocity())
+    local pipeDistance
+    local pipe = (destination - origin):normalize()
+    local r = (worldPos - origin):dot(pipe) / pipe:dot(pipe)
+    local L = origin + (r * pipe)
+    pipeDistance = (L - worldPos):len()
+    return pipeDistance
+end
+
+function getETA(distance, pipeDist, x, y)
+    if distance / 200000 > 100 and pipeDist < 600000 or pipeDist < 100000 then
+        local time = distance / vec3(construct.getWorldVelocity()):len()
+        if time < 10 * 60 * 60 then
+            return [[<text x="]] ..
+                x + 10 ..
+                [[" y="]] ..
+                y + 30 .. [[" fill="#c7dcff">ETA ]] .. seconds_to_clock(time) .. [[</text>]]
+        end
+    end
+    return ""
 end
 
 function radarRange()
