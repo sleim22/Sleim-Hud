@@ -949,6 +949,7 @@ if pcall(require, "Transponder") and pcall(require, "Targets") and transponder t
     unit.setTimer("loadRequired", 2)
 end
 specialRadarTargets = {}
+local amountToFilterOutAbandonedConstructs = 50 --export:
 function updateRadar(match)
     if radar_size > 1 then
         if radar_1 == radar and radar_1.getOperationalState() == -1 then radar = radar_2 end
@@ -973,7 +974,13 @@ function updateRadar(match)
             local ident = radar.isConstructIdentified(id) == 1
             local randomid = getShortName(id)
             str = string.gsub(str, 'name":"', 'name":"' .. randomid .. ' - ')
-            if match and tagged then
+            if match and tagged and
+                not
+                (
+                radar.isConstructAbandoned(id) == 1 and #radar.getConstructIds() > amountToFilterOutAbandonedConstructs
+                    and
+                    not (radar.isConstructIdentified(id) == 1
+                        or id == radar.getTargetId())) then
                 list[#list + 1] = str
             elseif not match and not tagged then
                 list[#list + 1] = str
