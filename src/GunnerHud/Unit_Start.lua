@@ -1184,6 +1184,7 @@ end
 
 targetVektorPointInfront = 50 --export:
 targetVektorFromTarget = {}
+TargetVektorInfo = {}
 function calculateVektor()
     local P = targetVektorFromTarget[1]
     local Q = targetVektorFromTarget[2]
@@ -1193,7 +1194,21 @@ function calculateVektor()
     local lambda = meter / abstand
     local richtungsVerktor = Q - P
     local R = P + lambda * richtungsVerktor
+    TargetVektorInfo.currentPoint = R
+    TargetVektorInfo.vector = richtungsVerktor:normalize()
     setCalculatedWaypoint(R)
+end
+
+function moveTargetVectorPoint(forward)
+    if not (TargetVektorInfo.currentPoint and TargetVektorInfo.vector) then return end
+    local direction = 1;
+    if not forward then
+        direction = -1
+    end
+    system.print(TargetVektorInfo.vector:len())
+    local newPoint = TargetVektorInfo.currentPoint + direction * 200000 * 10 * TargetVektorInfo.vector
+    setCalculatedWaypoint(newPoint)
+    TargetVektorInfo.currentPoint = newPoint
 end
 
 function getPointFromTarget()
