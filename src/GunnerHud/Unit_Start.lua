@@ -988,47 +988,16 @@ end
 
 aliencores = { [1] = {
     name = "Alpha",
-    pos = { 33946188.8008, 71382020.5906, 28850112.1181 }
+    pos = { 33946000.0000, 71381990.0000, 28850000.0000 }
 }, [2] = {
-    name = "Beta",
-    pos = { -145633811.1992, -10577969.4094, -739352.8819 }
+    name = "Gamma",
+    pos = { -64334000.0000, 55522000.0000, -14400000.0000 }
 },
-    [3] = {
-        name = "Epsilon",
-        pos = { 48566188.8008, 19622030.5906, 101000112.1181 }
-    },
-    [4] = {
-        name = "Eta",
-        pos = { -73133811.1992, 18722030.5906, -93699887.8819 }
-    },
-    [5] = {
-        name = "Delta",
-        pos = { 13666188.8008, 1622030.5906, -46839887.8819 }
-    },
-    [6] = {
-        name = "Kappa",
-        pos = { -45533811.1992, -46877969.4094, -739352.8819 }
-    },
-    [7] = {
-        name = "Zeta",
-        pos = { 81766188.8008, 16912030.5906, 23860112.1181 }
-    },
-    [8] = {
-        name = "Theta",
-        pos = { 58166188.8008, -52377969.4094, -739352.8819 }
-    },
-    [9] = {
-        name = "Iota",
-        pos = { 966188.8008, -149277969.4094, -739352.8819 }
-    }, [10] = {
-        name = "Gamma",
-        pos = { -64333811.1992, 55522030.5906, -14399887.8819 }
-    },
 }
 
 alienAR = ""
 function drawAlienCores()
-    if false and lshiftPressed then
+    if lshiftPressed then
         alienAR = ""
         for _, v in pairs(aliencores) do
             local point = vec3(v.pos)
@@ -1184,6 +1153,7 @@ end
 
 targetVektorPointInfront = 50 --export:
 targetVektorFromTarget = {}
+TargetVektorInfo = {}
 function calculateVektor()
     local P = targetVektorFromTarget[1]
     local Q = targetVektorFromTarget[2]
@@ -1193,7 +1163,21 @@ function calculateVektor()
     local lambda = meter / abstand
     local richtungsVerktor = Q - P
     local R = P + lambda * richtungsVerktor
+    TargetVektorInfo.currentPoint = R
+    TargetVektorInfo.vector = richtungsVerktor:normalize()
     setCalculatedWaypoint(R)
+end
+
+function moveTargetVectorPoint(forward)
+    if not (TargetVektorInfo.currentPoint and TargetVektorInfo.vector) then return end
+    local direction = 1;
+    if not forward then
+        direction = -1
+    end
+    system.print(TargetVektorInfo.vector:len())
+    local newPoint = TargetVektorInfo.currentPoint + direction * 200000 * 10 * TargetVektorInfo.vector
+    setCalculatedWaypoint(newPoint)
+    TargetVektorInfo.currentPoint = newPoint
 end
 
 function getPointFromTarget()
