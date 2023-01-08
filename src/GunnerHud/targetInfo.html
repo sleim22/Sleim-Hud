@@ -1,0 +1,69 @@
+<style>
+    .enemyInfoCss {
+        position: fixed;
+        top: 8%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 500px;
+        color: #80ffff;
+        text-align: center;
+    }
+
+    .enemySpeed {
+        position: fixed;
+        top: 50%;
+        left: 35%;
+    }
+
+    .dmgDoneLabels {
+        display: grid;
+        grid-template-columns: auto auto auto;
+        font-size: 12px;
+        padding: 0px;
+    }
+
+    .targetInfoLabels {
+        display: grid;
+        grid-template-columns: auto auto auto auto;
+        font-size: 14px;
+        padding: 0px;
+    }
+</style>
+<div class="enemySpeed">Speed: ]] .. comma_value(targetSpeed) .. [[km/h <br>]]
+    .. speedChange .. [[</div>
+<div class="enemyInfoCss">
+    <h3 style="text-align: center;">*]] .. targetName .. [[*</h3>
+    <div>
+        <svg width="100%" height="24px" style="font-family: Calibri;fill:white;stroke:#80ffff;font-weight:bold">
+            <rect x="0" y="0" rx="10" ry="10" width="100%" height="24"
+                style="fill:#142027;stroke:#098dfe;stroke-width:1;opacity:0.8" />
+
+            <rect x="0" y="1" rx="10" ry="10" width="]] ..
+dmgPercent .. [[" height="22" style="fill:red;stroke:black;stroke-width:0;opacity:0.5" />
+            <text x="45%" y="18">]] .. dmgDoneFormatted .. [[</text>
+        </svg>
+    </div>
+    <div class="dmgDoneLabels">
+        <div style="text-align: left;">0</div>
+        <div style="text-align: center;">5mil</div>
+        <div style="text-align: right;">10mil</div>
+    </div>
+    <h3>Hitchance</h3>
+    <div>
+        <svg width="80%" height="24px" style="font-family: Calibri;fill:white;stroke:#80ffff;font-weight:bold">
+            <rect x="0" y="0" rx="10" ry="10" width="100%" height="24"
+                style="fill:#142027;stroke:#098dfe;stroke-width:1;opacity:0.8" />
+
+            <rect x="0" y="1" rx="10" ry="10" width="]] .. probil .. [[%" height="22"
+                style="fill:gray;stroke:black;stroke-width:0;opacity:0.5" />
+            <text x="45%" y="18">]] .. probil .. [[%</text>
+        </svg>
+    </div>
+    <div class="targetInfoLabels">
+        <div>]] ..
+            distanceChangeIcon .. " " .. round(targetDistance, 2) .. distanceUnit .. [[</div>
+        <div>]] .. "max: " .. maxSpeed .. [[km/h</div>
+        <div>]] .. dps .. [[ dps</div>
+        <div>]] .. ttTenMilString .. [[</div>
+    </div>
+</div>

@@ -700,195 +700,180 @@ local callSpeedChange = true --export:
 local speedChange = ""
 function drawEnemyInfoDmgBar()
     local targetId = radar.getTargetId()
-
-    if targetId == 0 or radar.isConstructIdentified(targetId) == 0 then
+    if targetId == 0 then
         enemyInfoDmg = "";
         oldTargetSpeed = nil
         speedCounter = 0
         speedAnnounced = nil
         speedUpOrDown = ""
         speedChange = ""
-    else
-
-        if radar.isConstructIdentified(targetId) == 1 then
-            dmgDone = dmgTable[targetId] or 0;
-            dmgPercent = (dmgDone / 100000)
-            if dmgPercent > 100 then dmgPercent = 100 end
-            if dmgDone > 1000000 then
-                dmgDoneFormatted = string.format('%0.2f', (dmgDone / 1000000)) .. "M"
-            elseif dmgDone > 1000 then
-                dmgDoneFormatted = string.format('%0.2f', (dmgDone / 1000)) .. "k"
-            else
-                dmgDoneFormatted = "0"
-            end
-            targetDistance = math.floor(radar.getConstructDistance(targetId))
-            targetName = "[" ..
-                radar.getConstructCoreSize(targetId) .. "]-" ..
-                getShortName(targetId) .. "- " .. radar.getConstructName(targetId)
-            targetSpeed = math.floor(radar.getConstructSpeed(targetId) * 3.6)
-            if targetSpeed > oldSpeed then
-                speedChangeIcon = "↑"
-            elseif targetSpeed < oldSpeed then
-                speedChangeIcon = "↓"
-            else
-                speedChangeIcon = ""
-            end
-            if not oldTargetSpeed then oldTargetSpeed = targetSpeed end
-            if callSpeed then
-                local factor = math.floor(round(targetSpeed / 5000))
-                if not speedAnnounced then speedAnnounced = 5000 * factor end
-                if speedAnnounced ~= 5000 * factor and targetSpeed > 5000 * factor - 100 and
-                    targetSpeed < 5000 * factor + 100 then
-                    table.insert(Sound, "speed" .. 5000 * factor)
-                    oldTargetSpeed = targetSpeed
-                    speedAnnounced = 5000 * factor
-                end
-            end
-
-            if callSpeedChange then
-                local speedChangeLimit = 500
-                if targetSpeed - oldTargetSpeed > speedChangeLimit then
-                    oldTargetSpeed = targetSpeed
-                    speedCounter = 0
-                    if speedUpOrDown ~= "up" then
-                        speedUpOrDown = "up"
-                        speedChange = "Increasing"
-                        table.insert(Sound, "speedup")
-                    end
-                elseif oldTargetSpeed - targetSpeed > speedChangeLimit then
-                    oldTargetSpeed = targetSpeed
-                    speedCounter = 0
-                    if speedUpOrDown ~= "down" then
-                        speedUpOrDown = "down"
-                        speedChange = "Braking"
-                        table.insert(Sound, "speeddown")
-                    end
-                else
-                    if speedCounter < 100 then
-                        speedCounter = speedCounter + 1
-                    else
-                        if speedUpOrDown ~= "holding" then
-                            speedUpOrDown = "holding"
-                            speedChange = "Holding"
-                            table.insert(Sound, "speedholding")
-                        end
-                        speedCounter = 0
-                    end
-                end
-            end
-
-            if targetDistance > oldTargetDistance then
-                distanceChangeIcon = "↑"
-            elseif targetDistance < oldTargetDistance then
-                distanceChangeIcon = "↓"
-            else
-                distanceChangeIcon = ""
-            end
-            oldTargetDistance = targetDistance
-            oldSpeed = targetSpeed
-        end
-        if targetDistance < 1000 then
-            distanceUnit = "m"
-        elseif targetDistance < 100000 then
-            targetDistance = targetDistance / 1000
-            distanceUnit = "km"
-        else
-            targetDistance = targetDistance / 200000
-            distanceUnit = "su"
-        end
-        local maxSpeed = comma_value(math.floor(getMaxSpeedByMass(radar.getConstructMass(targetId))))
-        probil = math.floor(json.decode(weapon_1.getWidgetData()).properties.hitProbability * 100)
-        enemyInfoDmg = [[<style>
-                        .enemyInfoCss {
-                            position: fixed;
-                            top: 8%;
-                            left: 50%;
-                            transform: translateX(-50%);
-                            width: 500px;
-                            color: #80ffff;
-                        }
-                    
-                        .dmg-bar {
-                            background: #142027;
-                            color: white;
-                            font-size: 10px;
-                            border-radius: 5vh;
-                            border: 1px solid;
-                            border-color: #098dfe;
-                        }
-                    
-                        .dmgBarFullness {
-                            padding: 5px;
-                            border-radius: 5vh;
-                            height: 95%;
-                        }
-                    
-                        table.dmgBar {
-                            table-layout: fixed;
-                            border-spacing: 0 0px;
-                            border-collapse: separate;
-                        }
-                    
-                        table.dmgBar td {
-                            width: 110px;
-                        }.enemySpeed{
-                            position: fixed;
-                            top: 50%;
-                            left: 35%;
-                        }
-                    </style><div class="enemySpeed">Speed: ]] .. comma_value(targetSpeed) .. [[km/h <br>]]
-            .. speedChange .. [[</div>
-                    <div class="enemyInfoCss">
-                        <table class="dmgBar">
-                            <tr>
-                                <th colspan=5>*]] .. targetName .. [[*</th>
-                            </tr>
-
-                            <tr>
-                                <td colspan=5 style="padding: 0px;">
-                                    <div class="dmg-bar">
-                                        <div class="dmgBarFullness" style="width: ]] ..
-            dmgPercent .. [[%;background:darkred;text-align: right;">]] .. dmgDoneFormatted .. [[</div>
-                                    </div>
-                                </td>
-
-                            </tr>
-                            <tr style="font-size: 12px;padding: 0px;">
-                                <td colspan="2">0</td>
-                                <td style="text-align: center;">5mil</td>
-                                <td colspan="2" style="text-align: right;">10mil</td>
-                            </tr>
-                            <tr>
-                                <td colspan="2"></td>
-                                <td style="text-align: center;font-size: 18px;">Hitchance</td>
-                                <td colspan="2"></td>
-
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td colspan="3">
-                                    <div class="dmg-bar">
-                                        <div class="dmgBarFullness" style="width: ]] ..
-            probil .. [[%;background:gray;text-align: center;">
-                                            ]] .. probil .. [[%</div>
-                                    </div>
-                                </td>
-                                <td></td>
-
-                            </tr>
-                            <tr>
-                                <td style="text-align: right;">]] ..
-            distanceChangeIcon .. " " .. round(targetDistance, 2) .. distanceUnit .. [[</td>
-                                <td style="text-align: right;">]] ..
-            speedChangeIcon .. " " .. comma_value(targetSpeed) .. [[km/h / ~]] .. maxSpeed .. [[</td>
-                                <td></td>
-                                <td>]] .. dps .. [[ dps</td>
-                                <td>]] .. ttTenMilString .. [[</td>
-                            </tr>
-                        </table>
-                    </div>
-                                        ]]
+        maxSpeed = 0
+        return
     end
+    local isIdentified = radar.isConstructIdentified(targetId) == 1
+
+
+    dmgDone = dmgTable[targetId] or 0;
+    dmgPercent = (dmgDone / 100000)
+    if dmgPercent > 100 then dmgPercent = 100 end
+    if dmgDone > 1000000 then
+        dmgDoneFormatted = string.format('%0.2f', (dmgDone / 1000000)) .. "M"
+    elseif dmgDone > 1000 then
+        dmgDoneFormatted = string.format('%0.2f', (dmgDone / 1000)) .. "k"
+    else
+        dmgDoneFormatted = ""
+    end
+    targetDistance = math.floor(radar.getConstructDistance(targetId))
+    targetName = "[" ..
+        radar.getConstructCoreSize(targetId) .. "]-" ..
+        getShortName(targetId) .. "- " .. radar.getConstructName(targetId)
+    targetSpeed = math.floor(radar.getConstructSpeed(targetId) * 3.6)
+    if targetSpeed > oldSpeed then
+        speedChangeIcon = "↑"
+    elseif targetSpeed < oldSpeed then
+        speedChangeIcon = "↓"
+    else
+        speedChangeIcon = "→"
+    end
+    if not oldTargetSpeed then oldTargetSpeed = targetSpeed end
+    if callSpeed then
+        local factor = math.floor(round(targetSpeed / 5000))
+        if not speedAnnounced then speedAnnounced = 5000 * factor end
+        if speedAnnounced ~= 5000 * factor and targetSpeed > 5000 * factor - 100 and
+            targetSpeed < 5000 * factor + 100 then
+            table.insert(Sound, "speed" .. 5000 * factor)
+            oldTargetSpeed = targetSpeed
+            speedAnnounced = 5000 * factor
+        end
+    end
+
+    if callSpeedChange and isIdentified then
+        local speedChangeLimit = 500
+        if targetSpeed - oldTargetSpeed > speedChangeLimit then
+            oldTargetSpeed = targetSpeed
+            speedCounter = 0
+            if speedUpOrDown ~= "up" then
+                speedUpOrDown = "up"
+                speedChange = "Increasing"
+                table.insert(Sound, "speedup")
+            end
+        elseif oldTargetSpeed - targetSpeed > speedChangeLimit then
+            oldTargetSpeed = targetSpeed
+            speedCounter = 0
+            if speedUpOrDown ~= "down" then
+                speedUpOrDown = "down"
+                speedChange = "Braking"
+                table.insert(Sound, "speeddown")
+            end
+        else
+            if speedCounter < 100 then
+                speedCounter = speedCounter + 1
+            else
+                if speedUpOrDown ~= "holding" then
+                    speedUpOrDown = "holding"
+                    speedChange = "Holding"
+                    table.insert(Sound, "speedholding")
+                end
+                speedCounter = 0
+            end
+        end
+    end
+
+    if targetDistance > oldTargetDistance then
+        distanceChangeIcon = "↑"
+    elseif targetDistance < oldTargetDistance then
+        distanceChangeIcon = "↓"
+    else
+        distanceChangeIcon = "→"
+    end
+    oldTargetDistance = targetDistance
+    oldSpeed = targetSpeed
+
+    if targetDistance < 1000 then
+        distanceUnit = "m"
+    elseif targetDistance < 100000 then
+        targetDistance = targetDistance / 1000
+        distanceUnit = "km"
+    else
+        targetDistance = targetDistance / 200000
+        distanceUnit = "su"
+    end
+    local maxSpeed = isIdentified and comma_value(math.floor(getMaxSpeedByMass(radar.getConstructMass(targetId)))) or 0
+    probil = math.floor(json.decode(weapon_1.getWidgetData()).properties.hitProbability * 100)
+    enemyInfoDmg = [[<style>
+    .enemyInfoCss {
+    position: fixed;
+    top: 8%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    color: #80ffff;
+    text-align: center;
+}
+
+    .enemySpeed{
+    position: fixed;
+    top: 50%;
+    left: 35%;
+}
+    .dmgDoneLabels {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    font-size: 12px;
+}
+    .targetInfoLabels {
+    display: grid;
+    grid-template-columns: 25% 25% 25% 25%;
+    font-size:14px;
+}
+    </style>
+    <div class="enemySpeed">Speed: ]] .. comma_value(targetSpeed) .. [[km/h <br>]]
+        .. speedChange .. [[</div>
+    <div class="enemyInfoCss">
+    <h3 style="text-align: center;">*]] .. targetName .. [[*</h3>
+    <div>
+    <svg width="100%" height="24px" style="font-family: Calibri;fill:white;stroke:#80ffff;font-weight:bold">
+    <rect x="0" y="0" rx="10" ry="10" width="100%" height="24" style="fill:#142027;stroke:#098dfe;stroke-width:1;opacity:0.8" />
+
+    <rect x="0" y="1" rx="10" ry="10" width="]] ..
+        dmgPercent .. [[%" height="22" style="fill:red;stroke:black;stroke-width:0;opacity:0.5" />
+    <text x="50%" y="18"  text-anchor="middle">]] .. dmgDoneFormatted .. [[</text>
+    </svg>
+    </div>
+    <div class="dmgDoneLabels">
+    <div style="text-align: left;">0</div>
+    <div style="text-align: center;">5mil</div>
+    <div style="text-align: right;">10mil</div>
+    </div>]]
+    if isIdentified then
+        enemyInfoDmg = enemyInfoDmg ..
+            [[<h3>Hitchance</h3>
+        <div>
+        <svg width="80%" height="24px" style="font-family: Calibri;fill:white;stroke:#80ffff;font-weight:bold">
+        <rect x="0" y="0" rx="10" ry="10" width="100%" height="24"
+        style="fill:#142027;stroke:#098dfe;stroke-width:1;opacity:0.8" />
+
+        <rect x="0" y="1" rx="10" ry="10" width="]] .. probil .. [[%" height="22"
+        style="fill:gray;stroke:black;stroke-width:0;opacity:0.5" />
+        <text x="50%" y="18"  text-anchor="middle">]] .. probil .. [[%</text>
+        </svg>
+        </div>
+        ]]
+    end
+    enemyInfoDmg = enemyInfoDmg .. [[
+    <div class="targetInfoLabels">
+    <div>]] ..
+        distanceChangeIcon .. " " .. round(targetDistance, 2) .. distanceUnit .. [[</div>]]
+    if isIdentified then
+        enemyInfoDmg = enemyInfoDmg .. [[
+        <div>]] .. "max: " .. maxSpeed .. [[km/h</div>
+        <div>]] .. dps .. [[ dps</div>
+        <div>]] .. ttTenMilString .. [[</div><div></div>
+        <div>Current: ]] .. speedChangeIcon .. comma_value(targetSpeed) .. [[km/h</div>
+        ]]
+    end
+    enemyInfoDmg = enemyInfoDmg .. [[ </div></div>]]
+
 end
 
 function crossHair()
@@ -1006,6 +991,7 @@ function drawAlienCores()
             local xP = screenWidth * alienPosOnScreen[1]
             local yP = screenHeight * alienPosOnScreen[2]
             if xP > 0 and yP > 0 then
+                local eta = getETA(distance, pipeDist, xP + deth, yP + deth)
                 alienAR = alienAR ..
                     [[<div style="position: fixed;left: ]] ..
                     xP .. [[px;top:]] .. yP .. [[px;"><svg height="30" width="15">
@@ -1021,7 +1007,8 @@ function drawAlienCores()
                                                         C7.002,8.019,5.745,6.933,3.504,6.83z"/>
                                                     <path style="fill:purple;" d="M8.778,10.215c2.196-0.125,3.61-1.379,3.776-3.319C10.321,6.727,8.55,7.923,8.778,10.215z"/>
                                                 </g>
-                                            </svg>]] .. v.name .. " " .. getDistanceDisplayString(distance) .. [[</div>]]
+                                            </svg>]] ..
+                    v.name .. " " .. getDistanceDisplayString(distance) .. eta [[</div>]]
             end
         end
     else
