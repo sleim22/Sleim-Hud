@@ -7,6 +7,7 @@ printLocationOnContact = true --export: print own location on new target
 showTime               = true --export: Shows Time when new Targets enter radar range or leave
 maxAllies              = 10 --export: max Amount for detailed info about Allies, reduce if overlapping with threat info
 tempRadarTime          = 200 --export: temporary Radar time in seconds until it gets destroyed
+printHitAndMiss        = true --export:
 autoTargets            = false
 lshiftPressed          = false
 probil                 = 0
@@ -603,8 +604,10 @@ function addDmgToTable(id, dmg, weapon)
     elseif string.find(ammoType, "Electromagnetic") then
         displayType = "Electromagnetic"
     end
-    system.print(radar.getConstructName(id) ..
-        " hit for " .. string.format('%0.2f', (dmg / 1000)) .. "k damage (" .. displayType .. ")")
+    if printHitAndMiss then
+        system.print(radar.getConstructName(id) ..
+            " hit for " .. string.format('%0.2f', (dmg / 1000)) .. "k damage (" .. displayType .. ")")
+    end
     if not calculating then
         calculating = true
         unit.setTimer("DPS", 1)
@@ -1135,7 +1138,12 @@ function radarRange()
 end
 
 function printMiss(id)
-    system.print("Missed " .. radar.getConstructName(id))
+    if printHitAndMiss then
+        system.print("Missed " .. radar.getConstructName(id))
+    end
+    if showFloatyText then
+        table.insert(floatyText, { timer = 0, text = "Miss", hit = false })
+    end
 end
 
 targetVektorPointInfront = 50 --export:
