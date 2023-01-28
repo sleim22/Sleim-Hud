@@ -1057,12 +1057,15 @@ if hasCustomWaypoints then
         system.print(v.name)
     end
     system.print("--------------")
+else
+    customWaypoints = {}
 end
+filteredWaypoints = customWaypoints
 customWaypointsAR = ""
 function drawCustomWaypointsOnScreen()
-    if lshiftPressed and hasCustomWaypoints then
+    if lshiftPressed then
         customWaypointsAR = [[<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">]]
-        for _, v in pairs(customWaypoints) do
+        for _, v in pairs(filteredWaypoints) do
             local point = vec3(zeroConvertToWorldCoordinates(v.pos))
             local distance = (point - vec3(construct.getWorldPosition())):len()
             local customWaypointsPosOnScreen = library.getPointOnScreen({ point['x'], point['y'], point['z'] })
