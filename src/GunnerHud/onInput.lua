@@ -7,20 +7,20 @@ local function parseFilterString(filterString)
     local distance, area, rarity
     local distance_match = filterString:match("-d (%d+)")
     if distance_match then distance = tonumber(distance_match) end
-    local area_match = filterString:match("-a (%w+)")
+    local area_match = filterString:match("-a ([%w, ]+)")
     if area_match then area = area_match end
-    local rarity_match = filterString:match("-r (%w+)")
+    local rarity_match = filterString:match("-r ([%w, ]+)")
     if rarity_match then rarity = rarity_match end
-    return { distance = tonumber(distance) or 400 * 200000, area = area or nil, rarity = rarity or nil }
+    return { distance = tonumber(distance) or nil, area = area or nil, rarity = rarity or nil }
 end
 
-local function filterWaypoints(waypoints, filter)
+function filterWaypoints(waypoints, filter)
     local filteredWaypoints = {}
     for _, waypoint in pairs(waypoints) do
         local waypointCoordinates = zeroConvertToWorldCoordinates(waypoint.pos)
         local distance = (waypointCoordinates - vec3(construct.getWorldPosition())):len()
-        if (not filter.area or waypoint.area == filter.area) and
-            (not filter.rarity or waypoint.rarity == filter.rarity) and
+        if (not filter.area or not waypoint.area or string.find(filter.area, waypoint.area)) and
+            (not filter.rarity or not waypoint.rarity or string.find(filter.rarity, waypoint.rarity)) and
             (not filter.distance or distance < filter.distance * 200000) then
             table.insert(filteredWaypoints, waypoint)
         end
@@ -48,6 +48,10 @@ elseif beginning == "/add " then
     end
 elseif isFilterCommand(text) then
     local filter = parseFilterString(text)
+    local activeFilter = "Custom waypoints filtered! "
+    if filter.area then activeFilter = system.print("Area: " .. filter.area) end
+    if filter.rarity then activeFilter = system.print("Rarity: " .. filter.rarity) end
+    if filter.distance then activeFilter = system.print("Distance: " .. filter.distance) end
     filteredWaypoints = filterWaypoints(customWaypoints, filter)
 else
     system.print("Searching for: " .. string.upper(text))
