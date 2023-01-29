@@ -17,10 +17,10 @@ end
 function filterWaypoints(waypoints, filter)
     local filteredWaypoints = {}
     for _, waypoint in pairs(waypoints) do
-        local waypointCoordinates = zeroConvertToWorldCoordinates(waypoint.pos)
+        local waypointCoordinates = waypoint.pos
         local distance = (waypointCoordinates - vec3(construct.getWorldPosition())):len()
-        if (not filter.area or not waypoint.area or string.find(filter.area, waypoint.area)) and
-            (not filter.rarity or not waypoint.rarity or string.find(filter.rarity, waypoint.rarity)) and
+        if (not filter.area or (waypoint.area and string.find(filter.area, waypoint.area))) and
+            (not filter.rarity or (waypoint.rarity and string.find(filter.rarity, waypoint.rarity))) and
             (not filter.distance or distance < filter.distance * 200000) then
             table.insert(filteredWaypoints, waypoint)
         end
@@ -48,7 +48,7 @@ elseif beginning == "/add " then
     end
 elseif isFilterCommand(text) then
     local filter = parseFilterString(text)
-    local activeFilter = "Custom waypoints filtered! "
+    system.print("Custom waypoints filtered!")
     if filter.area then activeFilter = system.print("Area: " .. filter.area) end
     if filter.rarity then activeFilter = system.print("Rarity: " .. filter.rarity) end
     if filter.distance then activeFilter = system.print("Distance: " .. filter.distance) end
