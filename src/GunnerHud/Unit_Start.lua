@@ -809,7 +809,7 @@ function drawEnemyInfoDmgBar()
     top: 8%;
     left: 50%;
     transform: translateX(-50%);
-    width: 600px;
+    width: 560px;
     color: #80ffff;
     text-align: center;
 }
