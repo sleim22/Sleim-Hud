@@ -1055,6 +1055,8 @@ if hasCustomWaypoints then
     system.print("Loaded " .. #customWaypoints .. " Custom Waypoints for AR:")
     for _, v in pairs(customWaypoints) do
         system.print(v.name)
+        v.pos = vec3(zeroConvertToWorldCoordinates(v.pos))
+        v.offset = math.random(-10, 10)
     end
     system.print("--------------")
 else
@@ -1066,8 +1068,8 @@ function drawCustomWaypointsOnScreen()
     if lshiftPressed then
         customWaypointsAR = [[<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">]]
         for _, v in pairs(filteredWaypoints) do
-            local point = vec3(zeroConvertToWorldCoordinates(v.pos))
-            local distance = (point - vec3(construct.getWorldPosition())):len()
+            local point = v.pos
+            local distance = (v.pos - vec3(construct.getWorldPosition())):len()
             local customWaypointsPosOnScreen = library.getPointOnScreen({ point['x'], point['y'], point['z'] })
             local x = screenWidth * customWaypointsPosOnScreen[1]
             local y = screenHeight * customWaypointsPosOnScreen[2]
@@ -1084,7 +1086,7 @@ function drawCustomWaypointsOnScreen()
                     color .. [[" width="10" height="10" stroke-width="2" style="fill-opacity:0" /><text x="]] ..
                     x + 10 ..
                     [[" y="]] ..
-                    y + 10 ..
+                    y + 10 + v.offset ..
                     [[" fill="white">]] .. v.name .. " " .. getDistanceDisplayString(distance) .. [[</text>]] .. eta
             end
         end
