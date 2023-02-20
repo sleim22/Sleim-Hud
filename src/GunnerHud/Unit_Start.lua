@@ -1228,11 +1228,14 @@ function drawEstimatePos()
 	c5.984,2.387,11.028,6.474,14.993,12.152c3.968,5.669,5.983,12.468,5.983,20.197C242.386,266.434,238.481,275.632,230.779,282.948z
 	 M183.689,110c-2.628,0-10.756-3.764-22.7-18.01c-9.527-11.362-18.932-26.329-25.802-41.063c-3.368-7.223-5.472-13.002-6.754-17.406
 	c0.186,0.126,0.373,0.256,0.564,0.389c22.053,15.304,46.986,23.063,74.106,23.063c16.069,0,30.572-2.771,42.183-6.091
-	C232.265,84.407,206.971,110,183.689,110z"/></svg> ]] ..
-            TargetVektorInfo.displayName .. "<br>" .. getDistanceDisplayString(distance)
+	C232.265,84.407,206.971,110,183.689,110z"/></svg> ]]
         if opacity > 0.5 then
             estiamtedPos = estiamtedPos ..
-                "<br>Speed: " .. TargetVektorInfo.displaySpeed .. "km/h"
+                TargetVektorInfo.displayName ..
+                [[<div style="margin-left: 25px">]] .. getDistanceDisplayString(distance) ..
+                "<br>Speed: " .. TargetVektorInfo.displaySpeed .. "km/h</div>"
+        else
+            estiamtedPos = estiamtedPos .. getDistanceDisplayString(distance)
         end
         estiamtedPos = estiamtedPos .. [[</div>]]
     else
