@@ -15,7 +15,7 @@ targetSpeed            = 0
 oldSpeed               = 0
 targetDistance         = 0
 oldTargetDistance      = 0
-targetName             = "TargetInfo"
+targetName             = "Target"
 speedChangeIcon        = ""
 distanceChangeIcon     = ""
 maxCoreStress          = core.getMaxCoreStress()
@@ -1171,21 +1171,11 @@ function calculateVektor()
     -- v = s / t in m/s
     TargetVektorInfo.currentEstimatePosition = Q
     TargetVektorInfo.estimateSpeed = abstand / (TargetVektorInfo.secondTime - TargetVektorInfo.firstTime)
+    TargetVektorInfo.displaySpeed = comma_value(math.floor(TargetVektorInfo.estimateSpeed * 3.6))
+    TargetVektorInfo.displayName = targetName or "Target"
     TargetVektorInfo.lastTime = TargetVektorInfo.secondTime
     setCalculatedWaypoint(R)
     TargetVektorInfo.isTracking = true
-end
-
-function calcualteCurrentEstimatePos()
-    if not (TargetVektorInfo.isTracking) then return end
-    -- s = v * t in m
-    local newTime                            = system.getUtcTime()
-    local distTraveled                       = TargetVektorInfo.estimateSpeed * (newTime - TargetVektorInfo.lastTime)
-    local newPoint                           = TargetVektorInfo.currentEstimatePosition +
-        distTraveled * TargetVektorInfo.vector
-    -- setCalculatedWaypoint(newPoint)
-    TargetVektorInfo.currentEstimatePosition = newPoint
-    TargetVektorInfo.lastTime                = newTime
 end
 
 function drawEstimatePos()
@@ -1193,17 +1183,33 @@ function drawEstimatePos()
         estiamtedPos = ""
         return
     end
-    local point = vec3(TargetVektorInfo.currentEstimatePosition)
-    local estimatePosDraw = library.getPointOnScreen({ point['x'], point['y'], point['z'] })
-    local distance = (point - vec3(construct.getWorldPosition())):len()
-    local x = screenWidth * estimatePosDraw[1]
-    local y = screenHeight * estimatePosDraw[2]
+    local newTime                            = system.getUtcTime()
+    local distTraveled                       = TargetVektorInfo.estimateSpeed * (newTime - TargetVektorInfo.lastTime)
+    local newPoint                           = TargetVektorInfo.currentEstimatePosition +
+        distTraveled * TargetVektorInfo.vector
+    -- setCalculatedWaypoint(newPoint)
+    TargetVektorInfo.currentEstimatePosition = newPoint
+    TargetVektorInfo.lastTime                = newTime
+    local point                              = vec3(TargetVektorInfo.currentEstimatePosition)
+    local estimatePosDraw                    = library.getPointOnScreen({ point['x'], point['y'], point['z'] })
+    local distance                           = (point - vec3(construct.getWorldPosition())):len()
+    local x                                  = screenWidth * estimatePosDraw[1]
+    local y                                  = screenHeight * estimatePosDraw[2]
     if x > 0 and y > 0 then
+        local centerX = screenWidth / 2
+        local centerY = screenHeight / 2
+        local distanceFromCenter = math.sqrt((x - centerX) ^ 2 + (y - centerY) ^ 2)
+        local opacity = distanceFromCenter /
+            (screenWidth / 2) -- opacity ranges from 0 to 1 as you move from the edge to the center of the screen
+        opacity = math.max(1 - math.min(opacity * 2, 1), 0.5) -- double the opacity to increase the effect and ensure it doesn't exceed 1
+
         estiamtedPos = [[<div style="position: fixed;left: ]] ..
             x ..
             [[px;top:]] ..
             y ..
-            [[px;"><svg fill="gold" height="20px" width="20px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+            [[px;opacity: ]] ..
+            opacity ..
+            [[;"><svg fill="gold" height="20px" width="20px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
 	 viewBox="0 0 384.772 384.772" xml:space="preserve">
 <path d="M248.706,101.626c16.157-20.383,27.593-46.638,31.85-71.926c0.91-5.408-1.365-10.859-5.85-14.016
 	c-4.486-3.156-10.384-3.46-15.168-0.777c-0.242,0.136-24.576,13.57-56.434,13.57c-21.202,0-40.67-6.049-57.86-17.979
@@ -1222,7 +1228,13 @@ function drawEstimatePos()
 	c5.984,2.387,11.028,6.474,14.993,12.152c3.968,5.669,5.983,12.468,5.983,20.197C242.386,266.434,238.481,275.632,230.779,282.948z
 	 M183.689,110c-2.628,0-10.756-3.764-22.7-18.01c-9.527-11.362-18.932-26.329-25.802-41.063c-3.368-7.223-5.472-13.002-6.754-17.406
 	c0.186,0.126,0.373,0.256,0.564,0.389c22.053,15.304,46.986,23.063,74.106,23.063c16.069,0,30.572-2.771,42.183-6.091
-	C232.265,84.407,206.971,110,183.689,110z"/></svg> Target ]] .. getDistanceDisplayString(distance) .. [[</div>]]
+	C232.265,84.407,206.971,110,183.689,110z"/></svg> ]] ..
+            TargetVektorInfo.displayName .. "<br>" .. getDistanceDisplayString(distance)
+        if opacity > 0.5 then
+            estiamtedPos = estiamtedPos ..
+                "<br>Speed: " .. TargetVektorInfo.displaySpeed .. "km/h"
+        end
+        estiamtedPos = estiamtedPos .. [[</div>]]
     else
         estiamtedPos = ""
     end
