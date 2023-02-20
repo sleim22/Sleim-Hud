@@ -1153,7 +1153,7 @@ function printMiss(id)
     end
 end
 
-targetVektorPointInfront = 50 --export:
+targetVektorPointInfront = 10 --export:
 targetVektorFromTarget = {}
 TargetVektorInfo = {}
 function calculateVektor()
@@ -1170,6 +1170,7 @@ function calculateVektor()
     --new
     -- v = s / t in m/s
     TargetVektorInfo.currentEstimatePosition = Q
+    TargetVektorInfo.startPos = Q
     TargetVektorInfo.estimateSpeed = abstand / (TargetVektorInfo.secondTime - TargetVektorInfo.firstTime)
     TargetVektorInfo.displaySpeed = comma_value(math.floor(TargetVektorInfo.estimateSpeed * 3.6))
     TargetVektorInfo.displayName = targetName or "Target"
@@ -1178,18 +1179,34 @@ function calculateVektor()
     TargetVektorInfo.isTracking = true
 end
 
+function calculateAcceleration()
+    local P = targetVektorFromTarget[1]
+    local Q = targetVektorFromTarget[2]
+    local R = targetVektorFromTarget[3]
+    local deltaT1 = TargetVektorInfo.thirdTime - TargetVektorInfo.firstTime
+    local deltaT2 = TargetVektorInfo.thirdTime - TargetVektorInfo.secondTime
+    local speed1 = P:dist(Q) / (TargetVektorInfo.secondTime - TargetVektorInfo.firstTime)
+    local speed2 = Q:dist(R) / (TargetVektorInfo.thirdTime - TargetVektorInfo.secondTime)
+    local acceleration = -(speed2 - speed1) / (deltaT2 - deltaT1)
+    TargetVektorInfo.acceleration = acceleration
+    system.print(acceleration)
+    -- check if the target is moving in a straight line
+    local velocityDiff = TargetVektorInfo.velocity - speed1
+
+    local angle = math.deg((Q - P):angle_between(R - Q))
+    system.print(angle)
+    TargetVektorInfo.isMovingInStraightLine = angle < 10
+end
+
 function drawEstimatePos()
     if not (TargetVektorInfo.isTracking) then
         estiamtedPos = ""
         return
     end
     local newTime                            = system.getUtcTime()
-    local distTraveled                       = TargetVektorInfo.estimateSpeed * (newTime - TargetVektorInfo.lastTime)
-    local newPoint                           = TargetVektorInfo.currentEstimatePosition +
+    local distTraveled                       = TargetVektorInfo.estimateSpeed * (newTime - TargetVektorInfo.secondTime)
+    TargetVektorInfo.currentEstimatePosition = TargetVektorInfo.startPos +
         distTraveled * TargetVektorInfo.vector
-    -- setCalculatedWaypoint(newPoint)
-    TargetVektorInfo.currentEstimatePosition = newPoint
-    TargetVektorInfo.lastTime                = newTime
     local point                              = vec3(TargetVektorInfo.currentEstimatePosition)
     local estimatePosDraw                    = library.getPointOnScreen({ point['x'], point['y'], point['z'] })
     local distance                           = (point - vec3(construct.getWorldPosition())):len()
@@ -1268,6 +1285,10 @@ function addPoint(point)
         system.print("Target Vektor Point 2 added")
         TargetVektorInfo.secondTime = system.getUtcTime()
         calculateVektor()
+    elseif (#targetVektorFromTarget == 3) then
+        system.print("Target Vektor Point 3 added")
+        TargetVektorInfo.thirdTime = system.getUtcTime()
+        calculateAcceleration()
         targetVektorFromTarget = {}
     else
         TargetVektorInfo.firstTime = system.getUtcTime()
