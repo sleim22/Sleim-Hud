@@ -42,7 +42,7 @@ if weapon_size == 0 then
     system.print("No Weapons connected")
     unit.exit()
 end
-local kSkipCharSet = { ["O"] = true, ["Q"] = true, ["0"] = true }
+local kSkipCharSet = { ["O"] = true,["Q"] = true,["0"] = true }
 local kCharSet = {}
 
 local function addRangeToCharSet(a, b)
@@ -149,7 +149,6 @@ function printNewRadarContacts()
             elseif radar.isConstructAbandoned(v) == 1 then
                 newTargetName = newTargetName .. " - Abandoned"
             else
-
                 if not borderActive then
                     play("newContact")
                     borderActive = true
@@ -181,7 +180,8 @@ end
 function drawShield()
     shieldHp = shield_1.getShieldHitpoints()
     shieldPercent = shieldHp / shieldMax * 100
-    if shieldPercent == 100 then shieldPercent = "100"
+    if shieldPercent == 100 then
+        shieldPercent = "100"
     else
         shieldPercent = string.format('%0.2f', shieldPercent)
     end
@@ -190,8 +190,8 @@ function drawShield()
                     <style>
                     .health-bar {
                         position: fixed;
-                        width: 13em; 
-                        padding: 1vh; 
+                        width: 13em;
+                        padding: 1vh;
                         bottom: 5vh;
                         left: 50%;
                         transform: translateX(-50%);
@@ -227,8 +227,8 @@ function drawShield()
                     <style>
                     .stress-health-bar {
                         position: fixed;
-                        width: 13em; 
-                        padding: 1vh; 
+                        width: 13em;
+                        padding: 1vh;
                         bottom:]] .. stressBarHeight .. [[vh;
                         left: 50%;
                         transform: translateX(-50%);
@@ -246,7 +246,7 @@ function drawShield()
                         padding: 5px;
                         border-radius: 5vh;
                         background: #ff0000;
-                        opacity: 0.8;  
+                        opacity: 0.8;
                         width: ]] .. coreStressPercent .. [[%;
                         height: 40px;
                         position: relative;
@@ -278,7 +278,6 @@ requiredTargets = {}
 function readRequiredValues()
     requiredTargets = {}
     if autoTargets then
-
         local targets = require("Targets")
         for _, v in pairs(targets) do
             local id = v.shortid[1]
@@ -307,6 +306,7 @@ if pcall(require, "Transponder") and pcall(require, "Targets") and transponder t
 end
 specialRadarTargets = {}
 local amountToFilterOutAbandonedConstructs = 50 --export:
+knownContacts = { isEmpty = true }
 function updateRadar(match)
     if radar_size > 1 then
         if radar_1 == radar and radar_1.getOperationalState() == -1 then radar = radar_2 end
@@ -321,43 +321,45 @@ function updateRadar(match)
         local list = {}
         for str in constructList do
             local id = tonumber(str:match('"constructId":"([%d]*)"'))
-            local tagged = radar.hasMatchingTransponder(id) == 0 and true or false
-            if radar.hasMatchingTransponder(id) == 1 then
-                allies[#allies + 1] = id
-            end
-            if radar.getThreatRateFrom(id) > 1 then
-                threats[#threats + 1] = id
-            end
-            local ident = radar.isConstructIdentified(id) == 1
-            local randomid = getShortName(id)
-            str = string.gsub(str, 'name":"', 'name":"' .. randomid .. ' - ')
+            if not (knownContacts[id]) then
+                local tagged = radar.hasMatchingTransponder(id) == 0 and true or false
+                if radar.hasMatchingTransponder(id) == 1 then
+                    allies[#allies + 1] = id
+                end
+                if radar.getThreatRateFrom(id) > 1 then
+                    threats[#threats + 1] = id
+                end
+                local ident = radar.isConstructIdentified(id) == 1
+                local randomid = getShortName(id)
+                str = string.gsub(str, 'name":"', 'name":"' .. randomid .. ' - ')
 
-            if match and tagged and
-                not
-                (
-                radar.isConstructAbandoned(id) == 1 and #radar.getConstructIds() > amountToFilterOutAbandonedConstructs
+                if match and tagged and
+                    not
+                    (
+                    radar.isConstructAbandoned(id) == 1 and #radar.getConstructIds() > amountToFilterOutAbandonedConstructs
                     and
                     not (radar.isConstructIdentified(id) == 1
-                        or id == radar.getTargetId())) then
-                list[#list + 1] = str
-            elseif not match and not tagged then
-                list[#list + 1] = str
-            end
-            if targetCode == randomid then
-                table.insert(specialRadarTargets, 1, str)
-            end
-
-            for i = 1, #requiredTargets do
-                local requiredTarget = requiredTargets[i]
-
-                if requiredTarget == randomid then
-                    table.insert(specialRadarTargets, str)
+                    or id == radar.getTargetId())) then
+                    list[#list + 1] = str
+                elseif not match and not tagged then
+                    list[#list + 1] = str
                 end
-            end
+                if targetCode == randomid then
+                    table.insert(specialRadarTargets, 1, str)
+                end
 
-            if not specialRadar and #specialRadarTargets > 0 then
-                specialRadar = true
-                specialTargetRadar()
+                for i = 1, #requiredTargets do
+                    local requiredTarget = requiredTargets[i]
+
+                    if requiredTarget == randomid then
+                        table.insert(specialRadarTargets, str)
+                    end
+                end
+
+                if not specialRadar and #specialRadarTargets > 0 then
+                    specialRadar = true
+                    specialTargetRadar()
+                end
             end
         end
         return '{"constructsList":[' .. table.concat(list, ',') .. '],' .. data:match('"elementId":".+')
@@ -368,15 +370,15 @@ radarOnlyEnemeies = true
 fm = 'Enemies'
 rf = ''
 FCS_locked = false
-local _data = updateRadar(radarOnlyEnemeies)
+local customRadarData = updateRadar(radarOnlyEnemeies)
 
-local _panel = system.createWidgetPanel("RADAR")
-local _widget = system.createWidget(_panel, "value")
+local customRadarPanel = system.createWidgetPanel("RADAR")
+local customRadarWidget = system.createWidget(customRadarPanel, "value")
 radarFilter = system.createData('{"label":"Filter","' .. fm .. '' .. rf .. '","unit": ""}')
-system.addDataToWidget(radarFilter, _widget)
-local _widget = system.createWidget(_panel, "radar")
-radarData = system.createData(_data)
-system.addDataToWidget(radarData, _widget)
+system.addDataToWidget(radarFilter, customRadarWidget)
+local customSecondRadarWidget = system.createWidget(customRadarPanel, "radar")
+radarData = system.createData(customRadarData)
+system.addDataToWidget(radarData, customSecondRadarWidget)
 
 specialRadar = false
 function specialTargetRadar()
@@ -606,7 +608,7 @@ function addDmgToTable(id, dmg, weapon)
     end
     if printHitAndMiss then
         system.print(radar.getConstructName(id) ..
-            " hit for " .. string.format('%0.2f', (dmg / 1000)) .. "k damage (" .. displayType .. ")")
+        " hit for " .. string.format('%0.2f', (dmg / 1000)) .. "k damage (" .. displayType .. ")")
     end
     if not calculating then
         calculating = true
@@ -876,7 +878,6 @@ function drawEnemyInfoDmgBar()
         ]]
     end
     enemyInfoDmg = enemyInfoDmg .. [[ </div></div>]]
-
 end
 
 function crossHair()
@@ -950,7 +951,6 @@ function drawPlanetsOnScreen()
             if su < 10 then
                 deth = 250 - 800 * (distance / 1000 / 200 / 40)
             elseif su < 40 then
-
                 deth = 20
             end
             local pipeDist = getPipeDistance(point)
@@ -974,13 +974,15 @@ function drawPlanetsOnScreen()
     end
 end
 
-aliencores = { [1] = {
-    name = "Alpha",
-    pos = { 33946000.0000, 71381990.0000, 28850000.0000 }
-}, [2] = {
-    name = "Gamma",
-    pos = { -64334000.0000, 55522000.0000, -14400000.0000 }
-},
+aliencores = {
+    [1] = {
+        name = "Alpha",
+        pos = { 33946000.0000, 71381990.0000, 28850000.0000 }
+    },
+    [2] = {
+        name = "Gamma",
+        pos = { -64334000.0000, 55522000.0000, -14400000.0000 }
+    },
 }
 
 alienAR = ""
@@ -1056,7 +1058,7 @@ if hasCustomWaypoints then
     for _, v in pairs(customWaypoints) do
         system.print(v.name)
         v.pos = vec3(zeroConvertToWorldCoordinates(v.pos))
-        v.offset = math.random(-10, 10)
+        v.offset = math.random( -10, 10)
     end
     system.print("--------------")
 else
@@ -1066,7 +1068,8 @@ filteredWaypoints = customWaypoints
 customWaypointsAR = ""
 function drawCustomWaypointsOnScreen()
     if lshiftPressed then
-        customWaypointsAR = [[<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">]]
+        customWaypointsAR =
+        [[<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">]]
         for _, v in pairs(filteredWaypoints) do
             local point = v.pos
             local distance = (v.pos - vec3(construct.getWorldPosition())):len()
@@ -1139,7 +1142,6 @@ function radarRange()
                         right: 10px;
                     }</style><div class="radarInfo">Radar-Range: ]] ..
         round(radarIdentificationRange, 2) .. distanceUnit .. [[</div>]]
-
 end
 
 function printMiss(id)
@@ -1165,7 +1167,25 @@ function calculateVektor()
     local R = P + lambda * richtungsVerktor
     TargetVektorInfo.currentPoint = R
     TargetVektorInfo.vector = richtungsVerktor:normalize()
+    --new
+    -- v = s / t in m/s
+    TargetVektorInfo.currentEstimatePosition = Q
+    TargetVektorInfo.estimateSpeed = abstand / (TargetVektorInfo.secondTime - TargetVektorInfo.firstTime)
+    TargetVektorInfo.lastTime = TargetVektorInfo.secondTime
     setCalculatedWaypoint(R)
+    TargetVektorInfo.isTracking = true
+end
+
+function calcualteCurrentEstimatePos()
+    if not (TargetVektorInfo.isTracking) then return end
+    -- s = v * t in m
+    local newTime                            = system.getUtcTime()
+    local distTraveled                       = TargetVektorInfo.estimateSpeed * (newTime - TargetVektorInfo.lastTime)
+    local newPoint                           = TargetVektorInfo.currentEstimatePosition +
+        distTraveled * TargetVektorInfo.vector
+    -- setCalculatedWaypoint(newPoint)
+    TargetVektorInfo.currentEstimatePosition = newPoint
+    TargetVektorInfo.lastTime                = newTime
 end
 
 function moveTargetVectorPoint(forward)
@@ -1195,9 +1215,11 @@ function addPoint(point)
     table.insert(targetVektorFromTarget, point)
     if (#targetVektorFromTarget == 2) then
         system.print("Target Vektor Point 2 added")
+        TargetVektorInfo.secondTime = system.getUtcTime()
         calculateVektor()
         targetVektorFromTarget = {}
     else
+        TargetVektorInfo.firstTime = system.getUtcTime()
         system.print("Target Vektor Point 1 added")
     end
 end
