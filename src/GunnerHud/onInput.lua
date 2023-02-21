@@ -1,5 +1,4 @@
 local function isFilterCommand(inputString)
-
     return inputString:match("^/filter") ~= nil
 end
 
@@ -53,6 +52,16 @@ elseif isFilterCommand(text) then
     if filter.rarity then activeFilter = system.print("Rarity: " .. filter.rarity) end
     if filter.distance then activeFilter = system.print("Distance: " .. filter.distance) end
     filteredWaypoints = filterWaypoints(customWaypoints, filter)
+elseif beginning == "/spee" then
+    local speed = text:match("%d+")
+    if TargetVektorInfo.isTracking and speed then
+        TargetVektorInfo.manualSpeed = speed / 3.6
+        TargetVektorInfo.displaySpeed = comma_value(math.floor(speed))
+    end
+elseif text == "/import" then
+    importTargetVector()
+elseif text == "/export" then
+    exportTargetVector()
 else
     system.print("Searching for: " .. string.upper(text))
     targetCode = string.upper(text)

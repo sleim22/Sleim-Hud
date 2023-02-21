@@ -15,7 +15,7 @@ targetSpeed            = 0
 oldSpeed               = 0
 targetDistance         = 0
 oldTargetDistance      = 0
-targetName             = "TargetInfo"
+targetName             = "Target"
 speedChangeIcon        = ""
 distanceChangeIcon     = ""
 maxCoreStress          = core.getMaxCoreStress()
@@ -42,7 +42,7 @@ if weapon_size == 0 then
     system.print("No Weapons connected")
     unit.exit()
 end
-local kSkipCharSet = { ["O"] = true, ["Q"] = true, ["0"] = true }
+local kSkipCharSet = { ["O"] = true,["Q"] = true,["0"] = true }
 local kCharSet = {}
 
 local function addRangeToCharSet(a, b)
@@ -149,7 +149,6 @@ function printNewRadarContacts()
             elseif radar.isConstructAbandoned(v) == 1 then
                 newTargetName = newTargetName .. " - Abandoned"
             else
-
                 if not borderActive then
                     play("newContact")
                     borderActive = true
@@ -181,7 +180,8 @@ end
 function drawShield()
     shieldHp = shield_1.getShieldHitpoints()
     shieldPercent = shieldHp / shieldMax * 100
-    if shieldPercent == 100 then shieldPercent = "100"
+    if shieldPercent == 100 then
+        shieldPercent = "100"
     else
         shieldPercent = string.format('%0.2f', shieldPercent)
     end
@@ -190,8 +190,8 @@ function drawShield()
                     <style>
                     .health-bar {
                         position: fixed;
-                        width: 13em; 
-                        padding: 1vh; 
+                        width: 13em;
+                        padding: 1vh;
                         bottom: 5vh;
                         left: 50%;
                         transform: translateX(-50%);
@@ -227,8 +227,8 @@ function drawShield()
                     <style>
                     .stress-health-bar {
                         position: fixed;
-                        width: 13em; 
-                        padding: 1vh; 
+                        width: 13em;
+                        padding: 1vh;
                         bottom:]] .. stressBarHeight .. [[vh;
                         left: 50%;
                         transform: translateX(-50%);
@@ -246,7 +246,7 @@ function drawShield()
                         padding: 5px;
                         border-radius: 5vh;
                         background: #ff0000;
-                        opacity: 0.8;  
+                        opacity: 0.8;
                         width: ]] .. coreStressPercent .. [[%;
                         height: 40px;
                         position: relative;
@@ -278,7 +278,6 @@ requiredTargets = {}
 function readRequiredValues()
     requiredTargets = {}
     if autoTargets then
-
         local targets = require("Targets")
         for _, v in pairs(targets) do
             local id = v.shortid[1]
@@ -307,6 +306,7 @@ if pcall(require, "Transponder") and pcall(require, "Targets") and transponder t
 end
 specialRadarTargets = {}
 local amountToFilterOutAbandonedConstructs = 50 --export:
+knownContacts = { isEmpty = true }
 function updateRadar(match)
     if radar_size > 1 then
         if radar_1 == radar and radar_1.getOperationalState() == -1 then radar = radar_2 end
@@ -321,43 +321,45 @@ function updateRadar(match)
         local list = {}
         for str in constructList do
             local id = tonumber(str:match('"constructId":"([%d]*)"'))
-            local tagged = radar.hasMatchingTransponder(id) == 0 and true or false
-            if radar.hasMatchingTransponder(id) == 1 then
-                allies[#allies + 1] = id
-            end
-            if radar.getThreatRateFrom(id) > 1 then
-                threats[#threats + 1] = id
-            end
-            local ident = radar.isConstructIdentified(id) == 1
-            local randomid = getShortName(id)
-            str = string.gsub(str, 'name":"', 'name":"' .. randomid .. ' - ')
+            if not (knownContacts[id]) then
+                local tagged = radar.hasMatchingTransponder(id) == 0 and true or false
+                if radar.hasMatchingTransponder(id) == 1 then
+                    allies[#allies + 1] = id
+                end
+                if radar.getThreatRateFrom(id) > 1 then
+                    threats[#threats + 1] = id
+                end
+                local ident = radar.isConstructIdentified(id) == 1
+                local randomid = getShortName(id)
+                str = string.gsub(str, 'name":"', 'name":"' .. randomid .. ' - ')
 
-            if match and tagged and
-                not
-                (
-                radar.isConstructAbandoned(id) == 1 and #radar.getConstructIds() > amountToFilterOutAbandonedConstructs
+                if match and tagged and
+                    not
+                    (
+                    radar.isConstructAbandoned(id) == 1 and #radar.getConstructIds() > amountToFilterOutAbandonedConstructs
                     and
                     not (radar.isConstructIdentified(id) == 1
-                        or id == radar.getTargetId())) then
-                list[#list + 1] = str
-            elseif not match and not tagged then
-                list[#list + 1] = str
-            end
-            if targetCode == randomid then
-                table.insert(specialRadarTargets, 1, str)
-            end
-
-            for i = 1, #requiredTargets do
-                local requiredTarget = requiredTargets[i]
-
-                if requiredTarget == randomid then
-                    table.insert(specialRadarTargets, str)
+                    or id == radar.getTargetId())) then
+                    list[#list + 1] = str
+                elseif not match and not tagged then
+                    list[#list + 1] = str
                 end
-            end
+                if targetCode == randomid then
+                    table.insert(specialRadarTargets, 1, str)
+                end
 
-            if not specialRadar and #specialRadarTargets > 0 then
-                specialRadar = true
-                specialTargetRadar()
+                for i = 1, #requiredTargets do
+                    local requiredTarget = requiredTargets[i]
+
+                    if requiredTarget == randomid then
+                        table.insert(specialRadarTargets, str)
+                    end
+                end
+
+                if not specialRadar and #specialRadarTargets > 0 then
+                    specialRadar = true
+                    specialTargetRadar()
+                end
             end
         end
         return '{"constructsList":[' .. table.concat(list, ',') .. '],' .. data:match('"elementId":".+')
@@ -368,15 +370,15 @@ radarOnlyEnemeies = true
 fm = 'Enemies'
 rf = ''
 FCS_locked = false
-local _data = updateRadar(radarOnlyEnemeies)
+local customRadarData = updateRadar(radarOnlyEnemeies)
 
-local _panel = system.createWidgetPanel("RADAR")
-local _widget = system.createWidget(_panel, "value")
+local customRadarPanel = system.createWidgetPanel("RADAR")
+local customRadarWidget = system.createWidget(customRadarPanel, "value")
 radarFilter = system.createData('{"label":"Filter","' .. fm .. '' .. rf .. '","unit": ""}')
-system.addDataToWidget(radarFilter, _widget)
-local _widget = system.createWidget(_panel, "radar")
-radarData = system.createData(_data)
-system.addDataToWidget(radarData, _widget)
+system.addDataToWidget(radarFilter, customRadarWidget)
+local customSecondRadarWidget = system.createWidget(customRadarPanel, "radar")
+radarData = system.createData(customRadarData)
+system.addDataToWidget(radarData, customSecondRadarWidget)
 
 specialRadar = false
 function specialTargetRadar()
@@ -606,7 +608,7 @@ function addDmgToTable(id, dmg, weapon)
     end
     if printHitAndMiss then
         system.print(radar.getConstructName(id) ..
-            " hit for " .. string.format('%0.2f', (dmg / 1000)) .. "k damage (" .. displayType .. ")")
+        " hit for " .. string.format('%0.2f', (dmg / 1000)) .. "k damage (" .. displayType .. ")")
     end
     if not calculating then
         calculating = true
@@ -876,7 +878,6 @@ function drawEnemyInfoDmgBar()
         ]]
     end
     enemyInfoDmg = enemyInfoDmg .. [[ </div></div>]]
-
 end
 
 function crossHair()
@@ -950,7 +951,6 @@ function drawPlanetsOnScreen()
             if su < 10 then
                 deth = 250 - 800 * (distance / 1000 / 200 / 40)
             elseif su < 40 then
-
                 deth = 20
             end
             local pipeDist = getPipeDistance(point)
@@ -974,13 +974,15 @@ function drawPlanetsOnScreen()
     end
 end
 
-aliencores = { [1] = {
-    name = "Alpha",
-    pos = { 33946000.0000, 71381990.0000, 28850000.0000 }
-}, [2] = {
-    name = "Gamma",
-    pos = { -64334000.0000, 55522000.0000, -14400000.0000 }
-},
+aliencores = {
+    [1] = {
+        name = "Alpha",
+        pos = { 33946000.0000, 71381990.0000, 28850000.0000 }
+    },
+    [2] = {
+        name = "Gamma",
+        pos = { -64334000.0000, 55522000.0000, -14400000.0000 }
+    },
 }
 
 alienAR = ""
@@ -1056,7 +1058,7 @@ if hasCustomWaypoints then
     for _, v in pairs(customWaypoints) do
         system.print(v.name)
         v.pos = vec3(zeroConvertToWorldCoordinates(v.pos))
-        v.offset = math.random(-10, 10)
+        v.offset = math.random( -10, 10)
     end
     system.print("--------------")
 else
@@ -1066,7 +1068,8 @@ filteredWaypoints = customWaypoints
 customWaypointsAR = ""
 function drawCustomWaypointsOnScreen()
     if lshiftPressed then
-        customWaypointsAR = [[<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">]]
+        customWaypointsAR =
+        [[<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">]]
         for _, v in pairs(filteredWaypoints) do
             local point = v.pos
             local distance = (v.pos - vec3(construct.getWorldPosition())):len()
@@ -1139,7 +1142,6 @@ function radarRange()
                         right: 10px;
                     }</style><div class="radarInfo">Radar-Range: ]] ..
         round(radarIdentificationRange, 2) .. distanceUnit .. [[</div>]]
-
 end
 
 function printMiss(id)
@@ -1151,7 +1153,7 @@ function printMiss(id)
     end
 end
 
-targetVektorPointInfront = 50 --export:
+targetVektorPointInfront = 10 --export:
 targetVektorFromTarget = {}
 TargetVektorInfo = {}
 function calculateVektor()
@@ -1165,17 +1167,124 @@ function calculateVektor()
     local R = P + lambda * richtungsVerktor
     TargetVektorInfo.currentPoint = R
     TargetVektorInfo.vector = richtungsVerktor:normalize()
+    --new
+    -- v = s / t in m/s
+    TargetVektorInfo.currentEstimatePosition = Q
+    TargetVektorInfo.startPos = Q
+    TargetVektorInfo.estimateSpeed = abstand / (TargetVektorInfo.secondTime - TargetVektorInfo.firstTime)
+    TargetVektorInfo.displaySpeed = comma_value(math.floor(TargetVektorInfo.estimateSpeed * 3.6))
+    TargetVektorInfo.displayName = targetName or "Target"
     setCalculatedWaypoint(R)
+    TargetVektorInfo.isTracking = true
 end
 
-function moveTargetVectorPoint(forward)
-    if not (TargetVektorInfo.currentPoint and TargetVektorInfo.vector) then return end
-    local direction = 1;
-    if not forward then
-        direction = -1
+function calculateAcceleration()
+    local P = targetVektorFromTarget[1]
+    local Q = targetVektorFromTarget[2]
+    local R = targetVektorFromTarget[3]
+    local deltaT1 = TargetVektorInfo.thirdTime - TargetVektorInfo.firstTime
+    local deltaT2 = TargetVektorInfo.thirdTime - TargetVektorInfo.secondTime
+    local speed1 = P:dist(Q) / (TargetVektorInfo.secondTime - TargetVektorInfo.firstTime)
+    local speed2 = Q:dist(R) / (TargetVektorInfo.thirdTime - TargetVektorInfo.secondTime)
+    local acceleration = -(speed2 - speed1) / (deltaT2 - deltaT1)
+    TargetVektorInfo.acceleration = acceleration
+    system.print(acceleration)
+    -- check if the target is moving in a straight line
+    local velocityDiff = TargetVektorInfo.velocity - speed1
+
+    local angle = math.deg((Q - P):angle_between(R - Q))
+    system.print(angle)
+    TargetVektorInfo.isMovingInStraightLine = angle < 10
+end
+
+function exportTargetVector()
+    local p = TargetVektorInfo.startPos
+    local v = TargetVektorInfo.vector
+    local exportString = string.format(
+        "estimateSpeed = %f,timestamp = %f,startpos = { %f , %f , %f },vector = { %f , %f , %f },",
+        TargetVektorInfo.estimateSpeed, TargetVektorInfo.secondTime, p.x, p.y, p.z, v.x, v.y, v.z)
+    system.print(exportString)
+end
+
+function importTargetVector()
+    local hasTargetVector, TargetVector = pcall(require, "targetVectorExport")
+    if not hasTargetVector then return end
+    TargetVektorInfo.estimateSpeed = TargetVector.estimateSpeed
+    TargetVektorInfo.displaySpeed = comma_value(math.floor(TargetVektorInfo.estimateSpeed * 3.6))
+    TargetVektorInfo.secondTime = TargetVector.timestamp
+    TargetVektorInfo.startPos = vec3(TargetVector.startpos)
+    TargetVektorInfo.vector = vec3(TargetVector.vector)
+    TargetVektorInfo.displayName = "Target"
+    TargetVektorInfo.isTracking = true
+end
+
+function drawEstimatePos()
+    if not (TargetVektorInfo.isTracking) then
+        estiamtedPos = ""
+        return
     end
-    system.print(TargetVektorInfo.vector:len())
-    local newPoint = TargetVektorInfo.currentPoint + direction * 200000 * 10 * TargetVektorInfo.vector
+    local newTime                            = system.getUtcTime()
+    local speed                              = TargetVektorInfo.manualSpeed or TargetVektorInfo.estimateSpeed
+    local distTraveled                       = speed * (newTime - TargetVektorInfo.secondTime)
+    TargetVektorInfo.currentEstimatePosition = TargetVektorInfo.startPos +
+        distTraveled * TargetVektorInfo.vector
+    local point                              = vec3(TargetVektorInfo.currentEstimatePosition)
+    local estimatePosDraw                    = library.getPointOnScreen({ point['x'], point['y'], point['z'] })
+    local distance                           = (point - vec3(construct.getWorldPosition())):len()
+    local x                                  = screenWidth * estimatePosDraw[1]
+    local y                                  = screenHeight * estimatePosDraw[2]
+    if x > 0 and y > 0 then
+        local centerX = screenWidth / 2
+        local centerY = screenHeight / 2
+        local distanceFromCenter = math.sqrt((x - centerX) ^ 2 + (y - centerY) ^ 2)
+        local opacity = distanceFromCenter /
+            (screenWidth / 2) -- opacity ranges from 0 to 1 as you move from the edge to the center of the screen
+        opacity = math.max(1 - math.min(opacity * 2, 1), 0.5) -- double the opacity to increase the effect and ensure it doesn't exceed 1
+
+        estiamtedPos = [[<div style="position: fixed;left: ]] ..
+            x ..
+            [[px;top:]] ..
+            y ..
+            [[px;opacity: ]] ..
+            opacity ..
+            [[;"><svg fill="gold" height="20px" width="20px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+	 viewBox="0 0 384.772 384.772" xml:space="preserve">
+<path d="M248.706,101.626c16.157-20.383,27.593-46.638,31.85-71.926c0.91-5.408-1.365-10.859-5.85-14.016
+	c-4.486-3.156-10.384-3.46-15.168-0.777c-0.242,0.136-24.576,13.57-56.434,13.57c-21.202,0-40.67-6.049-57.86-17.979
+	C134.921,3.336,126.693,0,119.348,0c-7.008,0-13.219,3.169-17.041,8.695c-2.786,4.028-4.199,9.11-4.199,15.105
+	c0,19.444,14.778,48.827,27.433,68.08c2.548,3.876,5.347,7.888,8.353,11.858c-39.632,38.957-81.508,101.904-81.508,157.351
+	c0,87.943,62.682,123.684,140,123.684c77.318,0,140-35.74,140-123.684C332.386,204.628,288.964,140.392,248.706,101.626z
+	 M230.779,282.948c-6.581,6.251-15.387,10.417-26.217,12.432v20.075c0,6.892-5.587,12.479-12.479,12.479
+	s-12.478-5.587-12.478-12.479v-19.41c-15.81-2.142-27.643-8.99-35.16-20.397c-2.302-3.491-2.701-7.904-1.063-11.751
+	c1.638-3.849,5.093-6.621,9.204-7.384l9.42-1.749c4.819-0.896,9.719,1.116,12.52,5.141c3.543,5.093,9.539,7.674,17.819,7.674
+	c12.755,0,12.755-5.071,12.755-6.737c0-2.416-0.906-4.175-2.853-5.531c-1.988-1.387-5.61-2.62-10.764-3.668
+	c-20.721-4.223-34.068-9.704-39.682-16.294c-5.694-6.684-8.463-14.155-8.463-22.841c0-9.434,3.114-17.924,9.258-25.236
+	c5.945-7.08,15.035-11.674,27.009-13.679v-14.367c0-6.892,5.586-12.479,12.478-12.479s12.479,5.587,12.479,12.479v14.633
+	c10.719,2.047,19.085,6.378,25.44,13.176c2.931,3.135,4.045,7.556,2.951,11.703c-1.094,4.15-4.244,7.447-8.338,8.728l-6.464,2.023
+	c-4.688,1.468-9.802,0.046-13.063-3.63c-3.251-3.666-8.077-5.524-14.343-5.524c-5.046,0-11.063,1.201-11.063,6.926
+	c0,1.62,0.621,3.081,1.796,4.227c1.23,1.201,4.817,2.474,10.665,3.778c13.494,2.952,23.359,5.645,29.265,7.995
+	c5.984,2.387,11.028,6.474,14.993,12.152c3.968,5.669,5.983,12.468,5.983,20.197C242.386,266.434,238.481,275.632,230.779,282.948z
+	 M183.689,110c-2.628,0-10.756-3.764-22.7-18.01c-9.527-11.362-18.932-26.329-25.802-41.063c-3.368-7.223-5.472-13.002-6.754-17.406
+	c0.186,0.126,0.373,0.256,0.564,0.389c22.053,15.304,46.986,23.063,74.106,23.063c16.069,0,30.572-2.771,42.183-6.091
+	C232.265,84.407,206.971,110,183.689,110z"/></svg> ]]
+        if opacity > 0.5 then
+            estiamtedPos = estiamtedPos ..
+                TargetVektorInfo.displayName ..
+                [[<div style="margin-left: 25px">]] .. getDistanceDisplayString(distance) ..
+                "<br>Speed: " .. TargetVektorInfo.displaySpeed .. "km/h</div>"
+        else
+            estiamtedPos = estiamtedPos .. getDistanceDisplayString(distance)
+        end
+        estiamtedPos = estiamtedPos .. [[</div>]]
+    else
+        estiamtedPos = ""
+    end
+end
+
+function moveTargetVectorPoint(amount)
+    if not (TargetVektorInfo.currentPoint and TargetVektorInfo.vector) then return end
+
+    local newPoint = TargetVektorInfo.currentPoint + 200000 * amount * TargetVektorInfo.vector
     setCalculatedWaypoint(newPoint)
     TargetVektorInfo.currentPoint = newPoint
 end
@@ -1195,9 +1304,15 @@ function addPoint(point)
     table.insert(targetVektorFromTarget, point)
     if (#targetVektorFromTarget == 2) then
         system.print("Target Vektor Point 2 added")
+        TargetVektorInfo.secondTime = system.getUtcTime()
         calculateVektor()
+    elseif (#targetVektorFromTarget == 3) then
+        system.print("Target Vektor Point 3 added")
+        TargetVektorInfo.thirdTime = system.getUtcTime()
+        calculateAcceleration()
         targetVektorFromTarget = {}
     else
+        TargetVektorInfo.firstTime = system.getUtcTime()
         system.print("Target Vektor Point 1 added")
     end
 end
