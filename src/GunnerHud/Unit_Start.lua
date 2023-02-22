@@ -307,6 +307,7 @@ end
 specialRadarTargets = {}
 local amountToFilterOutAbandonedConstructs = 50 --export:
 knownContacts = { isEmpty = true }
+targetcount = 0
 function updateRadar(match)
     if radar_size > 1 then
         if radar_1 == radar and radar_1.getOperationalState() == -1 then radar = radar_2 end
@@ -314,11 +315,13 @@ function updateRadar(match)
     end
     allies = {}
     threats = {}
+    targetcount = 0
     specialRadarTargets = {}
     local data = radar.getWidgetData()
     if string.len(data) < 120000 then
         local constructList = data:gmatch('({"constructId":".-%b{}.-})')
         local list = {}
+        targetcount = 0
         for str in constructList do
             local id = tonumber(str:match('"constructId":"([%d]*)"'))
             if not (knownContacts[id]) then
@@ -340,6 +343,7 @@ function updateRadar(match)
                     and
                     not (radar.isConstructIdentified(id) == 1
                     or id == radar.getTargetId())) then
+                    targetcount = targetcount + 1
                     list[#list + 1] = str
                 elseif not match and not tagged then
                     list[#list + 1] = str
@@ -439,7 +443,7 @@ function drawAlliesHtml()
                         <div class="allies">
                         <table class="customTable">
                             <thead>
-                                <h2>Targets: ]] .. (#radar.getConstructIds() - allyAmount) .. [[</h2><br>
+                                <h2>Targets: ]] .. (targetcount) .. [[</h2><br>
                                 <h2>Allies: ]] .. allyAmount .. [[</h2><br>]] .. alliesHead() .. [[</thead>
                             <tbody>]] .. getAlliedInfo() .. [[</tbody>
                         </table></div>
@@ -1157,8 +1161,9 @@ targetVektorPointInfront = 10 --export:
 targetVektorFromTarget = {}
 TargetVektorInfo = {}
 function calculateVektor()
-    local P = targetVektorFromTarget[1]
-    local Q = targetVektorFromTarget[2]
+    local l = #targetVektorFromTarget
+    local P = targetVektorFromTarget[l - 1]
+    local Q = targetVektorFromTarget[l]
     local abstand = P:dist(Q)
     --system.print(abstand)
     local meter = 200000 * targetVektorPointInfront
@@ -1187,14 +1192,11 @@ function calculateAcceleration()
     local speed1 = P:dist(Q) / (TargetVektorInfo.secondTime - TargetVektorInfo.firstTime)
     local speed2 = Q:dist(R) / (TargetVektorInfo.thirdTime - TargetVektorInfo.secondTime)
     local acceleration = -(speed2 - speed1) / (deltaT2 - deltaT1)
-    TargetVektorInfo.acceleration = acceleration
-    system.print(acceleration)
+    TargetVektorInfo.displayAcceleration = string.format("%.2f G's", acceleration / 9.81)
+    system.print("Estimated Acceleration: " .. TargetVektorInfo.displayAcceleration)
     -- check if the target is moving in a straight line
-    local velocityDiff = TargetVektorInfo.velocity - speed1
-
     local angle = math.deg((Q - P):angle_between(R - Q))
-    system.print(angle)
-    TargetVektorInfo.isMovingInStraightLine = angle < 10
+    system.print(string.format("Angle difference of 2 Vectors %.2f°", angle))
 end
 
 function exportTargetVector()
@@ -1216,6 +1218,8 @@ function importTargetVector()
     TargetVektorInfo.vector = vec3(TargetVector.vector)
     TargetVektorInfo.displayName = "Target"
     TargetVektorInfo.isTracking = true
+    TargetVektorInfo.manualSpeed = nil
+    TargetVektorInfo.currentPoint = TargetVektorInfo.startPos
 end
 
 function drawEstimatePos()
