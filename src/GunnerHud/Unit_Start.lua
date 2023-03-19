@@ -1,13 +1,13 @@
-showWeapons            = true --export: Shows Weapon Widgets in 3rd person
-showShield             = true --export: shows Shield Status
-showAllies             = true --export: adds info about allies
-showThreats            = true --export: adds info about Threats
+showWeapons            = true  --export: Shows Weapon Widgets in 3rd person
+showShield             = true  --export: shows Shield Status
+showAllies             = true  --export: adds info about allies
+showThreats            = true  --export: adds info about Threats
 printSZContacts        = false --export: print new Contacs in Safezone, default off
-printLocationOnContact = true --export: print own location on new target
-showTime               = true --export: Shows Time when new Targets enter radar range or leave
-maxAllies              = 10 --export: max Amount for detailed info about Allies, reduce if overlapping with threat info
-tempRadarTime          = 200 --export: temporary Radar time in seconds until it gets destroyed
-printHitAndMiss        = true --export:
+printLocationOnContact = true  --export: print own location on new target
+showTime               = true  --export: Shows Time when new Targets enter radar range or leave
+maxAllies              = 10    --export: max Amount for detailed info about Allies, reduce if overlapping with threat info
+tempRadarTime          = 200   --export: temporary Radar time in seconds until it gets destroyed
+printHitAndMiss        = true  --export:
 autoTargets            = false
 lshiftPressed          = false
 probil                 = 0
@@ -612,7 +612,7 @@ function addDmgToTable(id, dmg, weapon)
     end
     if printHitAndMiss then
         system.print(radar.getConstructName(id) ..
-        " hit for " .. string.format('%0.2f', (dmg / 1000)) .. "k damage (" .. displayType .. ")")
+            " hit for " .. string.format('%0.2f', (dmg / 1000)) .. "k damage (" .. displayType .. ")")
     end
     if not calculating then
         calculating = true
@@ -704,7 +704,7 @@ local oldTargetSpeed = nil
 local speedCounter = 0
 local speedAnnounced = nil
 local speedUpOrDown = ""
-local callSpeed = true --export:
+local callSpeed = true       --export:
 local callSpeedChange = true --export:
 local speedChange = ""
 function drawEnemyInfoDmgBar()
@@ -745,7 +745,7 @@ function drawEnemyInfoDmgBar()
         speedChangeIcon = "→"
     end
     if not oldTargetSpeed then oldTargetSpeed = targetSpeed end
-    if callSpeed then
+    if callSpeed and isIdentified then
         local factor = math.floor(round(targetSpeed / 5000))
         if not speedAnnounced then speedAnnounced = 5000 * factor end
         if speedAnnounced ~= 5000 * factor and targetSpeed > 5000 * factor - 100 and
@@ -1062,7 +1062,7 @@ if hasCustomWaypoints then
     for _, v in pairs(customWaypoints) do
         system.print(v.name)
         v.pos = vec3(zeroConvertToWorldCoordinates(v.pos))
-        v.offset = math.random( -10, 10)
+        v.offset = math.random(-10, 10)
     end
     system.print("--------------")
 else
@@ -1242,7 +1242,7 @@ function drawEstimatePos()
         local centerY = screenHeight / 2
         local distanceFromCenter = math.sqrt((x - centerX) ^ 2 + (y - centerY) ^ 2)
         local opacity = distanceFromCenter /
-            (screenWidth / 2) -- opacity ranges from 0 to 1 as you move from the edge to the center of the screen
+            (screenWidth / 2)                                 -- opacity ranges from 0 to 1 as you move from the edge to the center of the screen
         opacity = math.max(1 - math.min(opacity * 2, 1), 0.5) -- double the opacity to increase the effect and ensure it doesn't exceed 1
 
         estiamtedPos = [[<div style="position: fixed;left: ]] ..
