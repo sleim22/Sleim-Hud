@@ -3,8 +3,8 @@ rollInput = 0
 yawInput = 0
 drift = false
 pitchSpeedFactor = 0.8 --export: This factor will increase/decrease the player input along the pitch axis<br>(higher value may be unstable)<br>Valid values: Superior or equal to 0.01
-yawSpeedFactor = 1 --export: This factor will increase/decrease the player input along the yaw axis<br>(higher value may be unstable)<br>Valid values: Superior or equal to 0.01
-rollSpeedFactor = 1.5 --export: This factor will increase/decrease the player input along the roll axis<br>(higher value may be unstable)<br>Valid values: Superior or equal to 0.01
+yawSpeedFactor = 1     --export: This factor will increase/decrease the player input along the yaw axis<br>(higher value may be unstable)<br>Valid values: Superior or equal to 0.01
+rollSpeedFactor = 1.5  --export: This factor will increase/decrease the player input along the roll axis<br>(higher value may be unstable)<br>Valid values: Superior or equal to 0.01
 screenHeight = system.getScreenHeight()
 screenWidth = system.getScreenWidth()
 unit.hideWidget()
@@ -236,7 +236,6 @@ function drawFuelInfo()
                         </tr>]]
 	end
 	for i = 1, #spacefueltank do
-
 		fuelHtml = fuelHtml .. addFuelTank(spacefueltank[i], i)
 	end
 	if atmofueltank_size > 0 then
@@ -269,7 +268,7 @@ function brakeHud()
                             position: fixed;
                             left: 50%;
                             bottom: 25%;
-                            transform: translateX(-50%); 
+                            transform: translateX(-50%);
                             text-align: center;
                             color: red;
                             text-shadow: 2px 2px 2px black;
@@ -342,7 +341,7 @@ function speedInfo()
                         }
                     table.speed td{
                         width: 110px;
-                    }          
+                    }
                     </style>
                         <table class="speed">
                             <tr>
@@ -469,7 +468,6 @@ function drawEnemyDPS()
 		ShieldRes[2] = { resistances[2], "EM", sRR[2] }
 		ShieldRes[3] = { resistances[3], "KI", sRR[3] }
 		ShieldRes[4] = { resistances[4], "TH", sRR[4] }
-
 	end
 	ShieldDisplay.setString = "Set"
 	if resCd > 0 then
@@ -494,129 +492,128 @@ function drawEnemyDPS()
 				<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;fill:white;stroke:#80ffff;font-weight:bold">
 
 					<rect x="]] ..
-			ShieldDisplay.startX ..
-			[[" y="]] ..
-			ShieldDisplay.startY ..
-			[[" rx="20" ry="20" width="]] ..
-			ShieldDisplay.totalWidth ..
-			[[" height="]] .. ShieldDisplay.totalHeight .. [[" style="stroke-width:2;fill-opacity:0"/>
+				ShieldDisplay.startX ..
+				[[" y="]] ..
+				ShieldDisplay.startY ..
+				[[" rx="20" ry="20" width="]] ..
+				ShieldDisplay.totalWidth ..
+				[[" height="]] .. ShieldDisplay.totalHeight .. [[" style="stroke-width:2;fill-opacity:0"/>
 
 					<text x="]] ..
-			ShieldDisplay.startX + 30 ..
-			[[" y="]] .. ShieldDisplay.startY + ShieldDisplay.textMargin .. [[">Enemy DPS: ]] .. dps .. [[</text>
+				ShieldDisplay.startX + 30 ..
+				[[" y="]] .. ShieldDisplay.startY + ShieldDisplay.textMargin .. [[">Enemy DPS: ]] .. dps .. [[</text>
 					<text x="]] ..
-			ShieldDisplay.startX + 30 ..
-			[[" y="]] ..
-			ShieldDisplay.startY + ShieldDisplay.textMargin * 2 ..
-			[[" fill="]] .. shieldDownColor .. [[">Time till shield down: ]] .. ttZString .. [[</text>
+				ShieldDisplay.startX + 30 ..
+				[[" y="]] ..
+				ShieldDisplay.startY + ShieldDisplay.textMargin * 2 ..
+				[[" fill="]] .. shieldDownColor .. [[">Time till shield down: ]] .. ttZString .. [[</text>
 						<line x1="]] ..
-			ShieldDisplay.startX + 10 ..
-			[[" y1="]] ..
-			ShieldDisplay.startY + ShieldDisplay.barMargin * 2 ..
-			[[" x2="]] ..
-			ShieldDisplay.startX + ShieldDisplay.totalWidth - 10 ..
-			[[" y2="]] .. ShieldDisplay.startY + ShieldDisplay.barMargin * 2 .. [[" style="stroke-width:2" />
+				ShieldDisplay.startX + 10 ..
+				[[" y1="]] ..
+				ShieldDisplay.startY + ShieldDisplay.barMargin * 2 ..
+				[[" x2="]] ..
+				ShieldDisplay.startX + ShieldDisplay.totalWidth - 10 ..
+				[[" y2="]] .. ShieldDisplay.startY + ShieldDisplay.barMargin * 2 .. [[" style="stroke-width:2" />
 					
 					<text x="]] ..
-			ShieldDisplay.startX + 30 ..
-			[[" y="]] ..
-			ShieldDisplay.startY + ShieldDisplay.barMargin * 3 ..
-			[[">Points left: ]] .. math.floor(ShieldRes.currentPool * 100) ..
-			"/" .. math.floor(ShieldRes.maxPool * 100) .. [[</text>
+				ShieldDisplay.startX + 30 ..
+				[[" y="]] ..
+				ShieldDisplay.startY + ShieldDisplay.barMargin * 3 ..
+				[[">Points left: ]] .. math.floor(ShieldRes.currentPool * 100) ..
+				"/" .. math.floor(ShieldRes.maxPool * 100) .. [[</text>
 
 					]]
 
 		for i = 1, 4, 1 do
 			ShieldDisplay.HTML = ShieldDisplay.HTML ..
-				[[<text x="]] ..
-				ShieldDisplay.startX + 12 ..
-				[[" y="]] ..
-				ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * i + 8 ..
-				[[" font-weight:"lighter" font-size="10">]] .. ShieldRes[i][2] .. [[</text>
+					[[<text x="]] ..
+					ShieldDisplay.startX + 12 ..
+					[[" y="]] ..
+					ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * i + 8 ..
+					[[" font-weight:"lighter" font-size="10">]] .. ShieldRes[i][2] .. [[</text>
 						<rect x="]] ..
-				ShieldDisplay.startX + 30 ..
-				[[" y="]] ..
-				ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * i ..
-				[[" rx="2" ry="2" width="]] ..
-				ShieldDisplay.resBarWidth * ShieldRes[i][1] / ShieldRes.maxPool ..
-				[[" height="10" style="stroke-width:0;fill-opacity:0.8;fill:white" />
+					ShieldDisplay.startX + 30 ..
+					[[" y="]] ..
+					ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * i ..
+					[[" rx="2" ry="2" width="]] ..
+					ShieldDisplay.resBarWidth * ShieldRes[i][1] / ShieldRes.maxPool ..
+					[[" height="10" style="stroke-width:0;fill-opacity:0.8;fill:white" />
 						<rect x="]] ..
-				ShieldDisplay.startX + 30 ..
-				[[" y="]] ..
-				ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * i ..
-				[[" rx="2" ry="2" width="]] .. ShieldDisplay.resBarWidth ..
-				[[" height="10" style="stroke-width:2;fill-opacity:0" />
+					ShieldDisplay.startX + 30 ..
+					[[" y="]] ..
+					ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * i ..
+					[[" rx="2" ry="2" width="]] .. ShieldDisplay.resBarWidth ..
+					[[" height="10" style="stroke-width:2;fill-opacity:0" />
 						
 						<rect x="]] ..
-				ShieldDisplay.startX + ShieldDisplay.resBarWidth + 40 ..
-				[[" y="]] ..
-				ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * i ..
-				[[" rx="2" ry="2" width="]] ..
-				(ShieldDisplay.totalWidth - ShieldDisplay.resBarWidth - 60) * ShieldRes[i][3] ..
-				[[" height="10" style="stroke-width:0;fill-opacity:0.8;fill:red" />
+					ShieldDisplay.startX + ShieldDisplay.resBarWidth + 40 ..
+					[[" y="]] ..
+					ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * i ..
+					[[" rx="2" ry="2" width="]] ..
+					(ShieldDisplay.totalWidth - ShieldDisplay.resBarWidth - 60) * ShieldRes[i][3] ..
+					[[" height="10" style="stroke-width:0;fill-opacity:0.8;fill:red" />
 						<rect x="]] ..
-				ShieldDisplay.startX + ShieldDisplay.resBarWidth + 40 ..
-				[[" y="]] ..
-				ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * i ..
-				[[" rx="2" ry="2" width="]] ..
-				(ShieldDisplay.totalWidth - ShieldDisplay.resBarWidth - 60) ..
-				[[" height="10" style="stroke-width:2;fill-opacity:0" />
+					ShieldDisplay.startX + ShieldDisplay.resBarWidth + 40 ..
+					[[" y="]] ..
+					ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * i ..
+					[[" rx="2" ry="2" width="]] ..
+					(ShieldDisplay.totalWidth - ShieldDisplay.resBarWidth - 60) ..
+					[[" height="10" style="stroke-width:2;fill-opacity:0" />
 						
 						]]
 		end
 		ShieldDisplay.HTML = ShieldDisplay.HTML .. [[
 					
 					<rect x="]] ..
-			ShieldDisplay.startX + 30 * ShieldDisplay.resFactorX ..
-			[[" y="]] ..
-			ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 5 ..
-			[[" rx="4" ry="4" width="]] ..
-			50 * ShieldDisplay.resFactorX .. [[" height="40" style="fill:yellow;stroke-width:2;fill-opacity:0" />
+				ShieldDisplay.startX + 30 * ShieldDisplay.resFactorX ..
+				[[" y="]] ..
+				ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 5 ..
+				[[" rx="4" ry="4" width="]] ..
+				50 * ShieldDisplay.resFactorX .. [[" height="40" style="fill:yellow;stroke-width:2;fill-opacity:0" />
 					<text x="]] ..
-			ShieldDisplay.startX + 45 * ShieldDisplay.resFactorX ..
-			[[" y="]] ..
-			ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 6 ..
-			[[" style="font-weight:bold">]] .. ShieldDisplay.setString .. [[</text>
+				ShieldDisplay.startX + 45 * ShieldDisplay.resFactorX ..
+				[[" y="]] ..
+				ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 6 ..
+				[[" style="font-weight:bold">]] .. ShieldDisplay.setString .. [[</text>
 					
 						<rect x="]] ..
-			ShieldDisplay.startX + 90 * ShieldDisplay.resFactorX ..
-			[[" y="]] ..
-			ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 5 ..
-			[[" rx="4" ry="4" width="]] ..
-			50 * ShieldDisplay.resFactorX .. [[" height="40" style="fill:yellow;stroke-width:2;fill-opacity:0" />
+				ShieldDisplay.startX + 90 * ShieldDisplay.resFactorX ..
+				[[" y="]] ..
+				ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 5 ..
+				[[" rx="4" ry="4" width="]] ..
+				50 * ShieldDisplay.resFactorX .. [[" height="40" style="fill:yellow;stroke-width:2;fill-opacity:0" />
 						<text x="]] ..
-			ShieldDisplay.startX + 98 * ShieldDisplay.resFactorX ..
-			[[" y="]] ..
-			ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 6 ..
-			[[" style="font-weight:bold">Reset</text>
+				ShieldDisplay.startX + 98 * ShieldDisplay.resFactorX ..
+				[[" y="]] ..
+				ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 6 ..
+				[[" style="font-weight:bold">Reset</text>
 
 			<rect x="]] ..
-			ShieldDisplay.startX + 150 * ShieldDisplay.resFactorX ..
-			[[" y="]] ..
-			ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 5 ..
-			[[" rx="4" ry="4" width="]] ..
-			65 * ShieldDisplay.resFactorX .. [[" height="40" style="fill:yellow;stroke-width:2;fill-opacity:0" />
+				ShieldDisplay.startX + 150 * ShieldDisplay.resFactorX ..
+				[[" y="]] ..
+				ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 5 ..
+				[[" rx="4" ry="4" width="]] ..
+				65 * ShieldDisplay.resFactorX .. [[" height="40" style="fill:yellow;stroke-width:2;fill-opacity:0" />
 						<text x="]] ..
-			ShieldDisplay.startX + ShieldDisplay.autoStringStart * ShieldDisplay.resFactorX ..
-			[[" y="]] ..
-			ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 6 ..
-			[[" style="font-weight:bold">]] .. ShieldDisplay.autoString .. [[</text>
+				ShieldDisplay.startX + ShieldDisplay.autoStringStart * ShieldDisplay.resFactorX ..
+				[[" y="]] ..
+				ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 6 ..
+				[[" style="font-weight:bold">]] .. ShieldDisplay.autoString .. [[</text>
 
 					<rect x="]] ..
-			ShieldDisplay.startX + ShieldDisplay.resBarWidth + ShieldDisplay.textMargin * 2 ..
-			[[" y="]] ..
-			ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 5 ..
-			[[" rx="4" ry="4" width="]] ..
-			(ShieldDisplay.totalWidth - ShieldDisplay.resBarWidth - 60) ..
-			[[" height="40" style="fill:yellow;stroke-width:2;fill-opacity:0" />
+				ShieldDisplay.startX + ShieldDisplay.resBarWidth + ShieldDisplay.textMargin * 2 ..
+				[[" y="]] ..
+				ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 5 ..
+				[[" rx="4" ry="4" width="]] ..
+				(ShieldDisplay.totalWidth - ShieldDisplay.resBarWidth - 60) ..
+				[[" height="40" style="fill:yellow;stroke-width:2;fill-opacity:0" />
 					<text x="]] ..
-			ShieldDisplay.startX + ShieldDisplay.resBarWidth + ShieldDisplay.textMargin * 3 ..
-			[[" y="]] ..
-			ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 6 ..
-			[[" style="font-weight:bold">]] .. ShieldDisplay.ventString .. [[</text>
+				ShieldDisplay.startX + ShieldDisplay.resBarWidth + ShieldDisplay.textMargin * 3 ..
+				[[" y="]] ..
+				ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 6 ..
+				[[" style="font-weight:bold">]] .. ShieldDisplay.ventString .. [[</text>
 					
 					</svg>]]
-
 	else
 		ShieldDisplay.HTML = ""
 	end
@@ -639,9 +636,61 @@ function seconds_to_clock(time_amount)
 	end
 end
 
+local kSkipCharSet = { ["O"] = true,["Q"] = true,["0"] = true }
+local kCharSet = {}
+
+local function addRangeToCharSet(a, b)
+	for i = a, b do
+		local c = string.char(i)
+		if not kSkipCharSet[c] then
+			kCharSet[#kCharSet + 1] = c
+		end
+	end
+end
+
+-- 0 - 9
+addRangeToCharSet(48, 57)
+-- A - Z
+addRangeToCharSet(65, 90)
+
+local kCharSetSize = #kCharSet
+
+local function getHash(x)
+	if x == nil then
+		return 0
+	end
+	x = ((x >> 16) ~ x) * 0x45d9f3b
+	x = ((x >> 16) ~ x) * 0x45d9f3b
+	x = (x >> 16) ~ x
+	if x < 0 then x = ~x end
+	return x
+end
+
+function getShortName(id)
+	local seed = getHash(id) % 8388593
+	local a = (seed * 653276) % 8388593
+	local b = (a * 653276) % 8388593
+	local c = (b * 653276) % 8388593
+	return kCharSet[a % kCharSetSize + 1] .. kCharSet[b % kCharSetSize + 1] .. kCharSet[c % kCharSetSize + 1]
+end
+
+function setFakeTags()
+	local time = math.floor(system.getUtcTime())
+	local fakeTag = getShortName(time) .. getShortName(time % 1000)
+	backupTags = transponder.getTags()
+	if transponder.setTags({ fakeTag }) == 1 then
+		system.print("Setting fake tags")
+		checkIfFakeTagIsNeeded = false
+		fakeTagsActive = true
+	end
+end
+
 shieldMax = shield.getMaxShieldHitpoints()
 venting = ""
 stressBarHeight = "5"
+fakeTagsActive = false
+checkIfFakeTagIsNeeded = false
+backupTags = {}
 function drawShield()
 	shieldHp = shield.getShieldHitpoints()
 	shieldPercent = shieldHp / shieldMax * 100
@@ -656,17 +705,32 @@ function drawShield()
 			table.insert(Sound, "shield50")
 		end
 	end
-	if shieldPercent == 100 then shieldPercent = "100"
+
+	local coreStress = core.getCoreStressRatio() * 100
+	coreStressPercent = string.format('%0.2f', coreStress)
+
+	if transponder and checkIfFakeTagIsNeeded and not fakeTagsActive and coreStressPercent > 50 then
+		setFakeTags()
+	end
+
+	if fakeTagsActive and shield.isActive() == 1 and shieldPercent > 25 then
+		if transponder.setTags(backupTags) == 1 then
+			system.print("Loading backup tags")
+			fakeTagsActive = false
+		end
+	end
+
+	if shieldPercent == 100 then
+		shieldPercent = "100"
 	else
 		shieldPercent = string.format('%0.2f', shieldPercent)
 	end
-	coreStressPercent = string.format('%0.2f', core.getCoreStressRatio() * 100)
 	local shieldHealthBar = [[
                     <style>
                     .health-bar {
                         position: fixed;
-                        width: 13em; 
-                        padding: 1vh; 
+                        width: 13em;
+                        padding: 1vh;
                         bottom: 5vh;
                         left: 50%;
                         transform: translateX(-50%);
@@ -702,8 +766,8 @@ function drawShield()
                     <style>
                     .stress-health-bar {
                         position: fixed;
-                        width: 13em; 
-                        padding: 1vh; 
+                        width: 13em;
+                        padding: 1vh;
                         bottom:]] .. stressBarHeight .. [[vh;
                         left: 50%;
                         transform: translateX(-50%);
@@ -721,7 +785,7 @@ function drawShield()
                         padding: 5px;
                         border-radius: 5vh;
                         background: #ff0000;
-                        opacity: 0.8;  
+                        opacity: 0.8;
                         width: ]] .. coreStressPercent .. [[%;
                         height: 40px;
                         position: relative;
@@ -756,7 +820,7 @@ function drawMouse()
 		local x = system.getMousePosX()
 		local y = system.getMousePosY()
 		mouseHtml = [[<svg  width="100%" height="100%" style="position: absolute;left:0%;top:0%;"><circle cx=]] ..
-			x .. [[ cy=]] .. y .. [[ r=2 stroke="red" stroke-width="3" fill="red"></svg>]]
+				x .. [[ cy=]] .. y .. [[ r=2 stroke="red" stroke-width="3" fill="red"></svg>]]
 	else
 		mouseHtml = ""
 	end
