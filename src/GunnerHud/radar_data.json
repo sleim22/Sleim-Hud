@@ -1,0 +1,75 @@
+{
+  "constructsList": [
+    {
+      "constructId": "8497683",
+      "distance": 18.745861229874091,
+      "inIdentifyRange": true,
+      "info": {},
+      "isIdentified": false,
+      "myThreatStateToTarget": 0,
+      "name": "VulcanoBase",
+      "size": "L",
+      "targetThreatState": 0
+    },
+    {
+      "constructId": "8527207",
+      "distance": 27.797803306118908,
+      "inIdentifyRange": true,
+      "info": {},
+      "isIdentified": false,
+      "myThreatStateToTarget": 0,
+      "name": "Target",
+      "size": "XS",
+      "targetThreatState": 0
+    },
+    {
+      "constructId": "8481644",
+      "distance": 33.358242218199464,
+      "inIdentifyRange": true,
+      "info": {},
+      "isIdentified": false,
+      "myThreatStateToTarget": 0,
+      "name": "{Legion Normandy}",
+      "size": "M",
+      "targetThreatState": 0
+    },
+    {
+      "constructId": "6628868",
+      "distance": 169.46670200905677,
+      "inIdentifyRange": true,
+      "info": {},
+      "isIdentified": false,
+      "myThreatStateToTarget": 0,
+      "name": "Sleims Hauler",
+      "size": "S",
+      "targetThreatState": 0
+    }
+  ],
+  "currentTargetId": "0",
+  "elementId": "3793617359",
+  "helperId": "radar",
+  "name": "Atmospheric Radar s [66]",
+  "properties": {
+    "broken": false,
+    "errorMessage": "",
+    "identifiedConstructs": [],
+    "identifyConstructs": {},
+    "radarStatus": 1,
+    "selectedConstruct": "0",
+    "sortMethod": 0,
+    "worksInEnvironment": true
+  },
+  "staticProperties": {
+    "maxIdentifiedTargets": 1,
+    "ranges": {
+      "identify128m": 2000.0,
+      "identify16m": 2000.0,
+      "identify32m": 2000.0,
+      "identify64m": 2000.0,
+      "scan": 10000
+    },
+    "worksInAtmosphere": true,
+    "worksInSpace": false
+  },
+  "type": "radar"
+}

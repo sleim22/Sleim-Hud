@@ -319,7 +319,8 @@ function updateRadar(match)
     specialRadarTargets = {}
     local data = radar.getWidgetData()
     if string.len(data) < 120000 then
-        local constructList = data:gmatch('({"constructId":".-%b{}.-})')
+        local constructListJson = data:match('"constructsList":%s*%[(.-)%]')
+        local constructList = constructListJson:gmatch("%b{}")
         local list = {}
         targetcount = 0
         for str in constructList do
