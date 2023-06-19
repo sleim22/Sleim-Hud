@@ -6,7 +6,7 @@ end
 unit.setTimer("sound", 1)
 
 -- timer
-if system.isPlayingSound() == 0 and #Sound > 0 then
+if not system.isPlayingSound() and #Sound > 0 then
     play(table.remove(Sound, 1))
 end
 

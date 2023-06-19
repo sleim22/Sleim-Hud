@@ -139,7 +139,7 @@ end
 
 function updatePipeInfo()
 	currentPos = construct.getWorldPosition()
-	local notPvPZone = construct.isInPvPZone() == 0
+	local notPvPZone = not construct.isInPvPZone()
 	local pvpDist = construct.getDistanceToSafeZone()
 	if pvpDist < 0 then pvpDist = pvpDist * (-1) end
 
@@ -486,7 +486,7 @@ function drawEnemyDPS()
 		ShieldDisplay.autoStringStart = 158
 	end
 
-	if (calculating and shield.isActive() == 1) or shield.isVenting() == 1 or ventCd > 0 or leftAltPressed or resCd > 0 then
+	if (calculating and shield.isActive()) or shield.isVenting() or ventCd > 0 or leftAltPressed or resCd > 0 then
 		ShieldDisplay.HTML = [[
 
 				<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;fill:white;stroke:#80ffff;font-weight:bold">
@@ -636,7 +636,7 @@ function seconds_to_clock(time_amount)
 	end
 end
 
-local kSkipCharSet = { ["O"] = true,["Q"] = true,["0"] = true }
+local kSkipCharSet = { ["O"] = true, ["Q"] = true, ["0"] = true }
 local kCharSet = {}
 
 local function addRangeToCharSet(a, b)
@@ -678,7 +678,7 @@ function setFakeTags()
 	local time = math.floor(system.getUtcTime())
 	local fakeTag = getShortName(time) .. getShortName(time % 1000)
 	backupTags = transponder.getTags()
-	if transponder.setTags({ fakeTag }) == 1 then
+	if transponder.setTags({ fakeTag }) then
 		system.print("Setting fake tags")
 		checkIfFakeTagIsNeeded = false
 		fakeTagsActive = true
@@ -713,8 +713,8 @@ function drawShield()
 		setFakeTags()
 	end
 
-	if fakeTagsActive and shield.isActive() == 1 and shieldPercent > 25 then
-		if transponder.setTags(backupTags) == 1 then
+	if fakeTagsActive and shield.isActive() and shieldPercent > 25 then
+		if transponder.setTags(backupTags) then
 			system.print("Loading backup tags")
 			fakeTagsActive = false
 		end
@@ -799,11 +799,11 @@ function drawShield()
                         </div>
                     </html>
                     ]]
-	if shield.isVenting() == 1 then
+	if shield.isVenting() then
 		stressBarHeight = "15"
 		venting = "Venting "
 		healthHtml = coreStressBar .. shieldHealthBar
-	elseif shield.isActive() == 0 or shield.getShieldHitpoints() == 0 then
+	elseif not shield.isActive() or shield.getShieldHitpoints() == 0 then
 		stressBarHeight = "5"
 		healthHtml = coreStressBar
 	else

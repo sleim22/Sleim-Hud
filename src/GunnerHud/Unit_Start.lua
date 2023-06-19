@@ -42,7 +42,7 @@ if weapon_size == 0 then
     system.print("No Weapons connected")
     unit.exit()
 end
-local kSkipCharSet = { ["O"] = true,["Q"] = true,["0"] = true }
+local kSkipCharSet = { ["O"] = true, ["Q"] = true, ["0"] = true }
 local kCharSet = {}
 
 local function addRangeToCharSet(a, b)
@@ -125,7 +125,7 @@ function getFriendlyDetails(id)
 end
 
 function printNewRadarContacts()
-    if zone == 1 or printSZContacts then
+    if zone or printSZContacts then
         local newTargetCounter = 0
         for k, v in pairs(newRadarContacts) do
             if newTargetCounter > 10 then
@@ -138,7 +138,7 @@ function printNewRadarContacts()
             if showTime then
                 newTargetName = newTargetName .. ' - Time: ' .. seconds_to_clock(system.getArkTime())
             end
-            if radar.hasMatchingTransponder(v) == 1 then
+            if radar.hasMatchingTransponder(v) then
                 newTargetName = newTargetName .. " - [Ally] Owner: " .. getFriendlyDetails(v)
                 if not borderActive then
                     borderColor = "green"
@@ -146,7 +146,7 @@ function printNewRadarContacts()
                     borderActive = true
                     unit.setTimer("cleanBorder", 1)
                 end
-            elseif radar.isConstructAbandoned(v) == 1 then
+            elseif radar.isConstructAbandoned(v) then
                 newTargetName = newTargetName .. " - Abandoned"
             else
                 if not borderActive then
@@ -260,11 +260,11 @@ function drawShield()
                         </div>
                     </html>
                     ]]
-    if shield_1.isVenting() == 1 then
+    if shield_1.isVenting() then
         stressBarHeight = "15"
         venting = "Venting "
         healthHtml = coreStressBar .. shieldHealthBar
-    elseif shield_1.isActive() == 0 or shield_1.getShieldHitpoints() == 0 then
+    elseif not shield_1.isActive() or shield_1.getShieldHitpoints() == 0 then
         stressBarHeight = "5"
         healthHtml = coreStressBar
     else
@@ -326,24 +326,24 @@ function updateRadar(match)
         for str in constructList do
             local id = tonumber(str:match('"constructId":"([%d]*)"'))
             if not (knownContacts[id]) then
-                local tagged = radar.hasMatchingTransponder(id) == 0 and true or false
-                if radar.hasMatchingTransponder(id) == 1 and radar.isConstructAbandoned(id) == 0 then
+                local tagged = not radar.hasMatchingTransponder(id)
+                if radar.hasMatchingTransponder(id) and not radar.isConstructAbandoned(id) then
                     allies[#allies + 1] = id
                 end
-                if radar.getThreatRateFrom(id) > 1 and radar.isConstructAbandoned(id) == 0 then
+                if radar.getThreatRateFrom(id) > 1 and not radar.isConstructAbandoned(id) then
                     threats[#threats + 1] = id
                 end
-                local ident = radar.isConstructIdentified(id) == 1
+                local ident = radar.isConstructIdentified(id)
                 local randomid = getShortName(id)
                 str = string.gsub(str, 'name":"', 'name":"' .. randomid .. ' - ')
 
                 if match and tagged and
                     not
                     (
-                    radar.isConstructAbandoned(id) == 1 and #radar.getConstructIds() > amountToFilterOutAbandonedConstructs
-                    and
-                    not (radar.isConstructIdentified(id) == 1
-                    or id == radar.getTargetId())) then
+                        radar.isConstructAbandoned(id) and #radar.getConstructIds() > amountToFilterOutAbandonedConstructs
+                        and
+                        not (radar.isConstructIdentified(id)
+                            or id == radar.getTargetId())) then
                     targetcount = targetcount + 1
                     list[#list + 1] = str
                 elseif not match and not tagged then
@@ -720,7 +720,7 @@ function drawEnemyInfoDmgBar()
         maxSpeed = 0
         return
     end
-    local isIdentified = radar.isConstructIdentified(targetId) == 1
+    local isIdentified = radar.isConstructIdentified(targetId)
 
 
     dmgDone = dmgTable[targetId] or 0;
