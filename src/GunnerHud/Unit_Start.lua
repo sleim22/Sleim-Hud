@@ -327,7 +327,7 @@ function updateRadar(match)
             local id = tonumber(str:match('"constructId":"([%d]*)"'))
             if not (knownContacts[id]) then
                 local tagged = not radar.hasMatchingTransponder(id)
-                if radar.hasMatchingTransponder(id) == 1 and not radar.isConstructAbandoned(id) then
+                if radar.hasMatchingTransponder(id) and not radar.isConstructAbandoned(id) then
                     allies[#allies + 1] = id
                 end
                 if radar.getThreatRateFrom(id) > 1 and not radar.isConstructAbandoned(id) then
