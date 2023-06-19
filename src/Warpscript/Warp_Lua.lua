@@ -4,9 +4,9 @@ yawInput = 0
 brakeInput = 1
 unit.hide()
 newRadarContacts = {}
-printSZContacts = false                       --export:
-printLocationOnContact = true                 --export:
-showTime = true                               --export:
+printSZContacts = false       --export:
+printLocationOnContact = true --export:
+showTime = true               --export:
 screenHtml = "<style>html{background-color:#36393E;}</style><h1>Scanning:</h1>"
 Nav = Navigator.new(system, core, unit)
 Nav.axisCommandManager:setupCustomTargetSpeedRanges(axisCommandId.longitudinal, { 1000, 5000, 10000, 20000, 30000 })
@@ -72,7 +72,7 @@ function getCurrentBody()
     local coord = vec3(coordinates)
     for i, v in pairs(atlas[0]) do
         local distance2 = (vec3(v.center) - coord):len2()
-        if v.type[1] == "Planet" and (not body or distance2 < minDistance2) then               -- Never return space.
+        if v.type[1] == "Planet" and (not body or distance2 < minDistance2) then -- Never return space.
             body = v
             minDistance2 = distance2
         end
@@ -362,7 +362,7 @@ function speedInfo()
         local m = m0 / (math.sqrt(1 - (v * v) / (c * c)))
         local a = maxBrakeThrust / m
         if v > a then
-            v = v - a                             --*1 sec
+            v = v - a --*1 sec
             dis = dis + v + a / 2.0
         elseif a ~= 0 then
             local t = v / a
@@ -440,7 +440,7 @@ end
 
 function printNewRadarContacts()
     if radar_size > 1 then
-        if radar_1.isOperational() == 0 then
+        if not radar_1.isOperational() then
             radar_1.hide()
             radar_2.show()
             radar = radar_2
@@ -476,13 +476,13 @@ function printNewRadarContacts()
             system.print("New Target: " .. newTargetName)
             if printLocationOnContact then
                 system.print(originPlanet ..
-                " - " .. pipePlanet .. " PvP-Border in " .. pvpDist .. " to " .. getCurrentBody().name[1])
+                    " - " .. pipePlanet .. " PvP-Border in " .. pvpDist .. " to " .. getCurrentBody().name[1])
                 system.print(system.getWaypointFromPlayerPos())
             end
             if screen_1 ~= nil then
                 screenHtml = screenHtml .. [[<div><h2>]] .. newTargetName .. [[</h2></div><br>
                             	<div><h4>]] ..
-                originPlanet .. " - " .. pipePlanet .. " PvP-Border in " .. pvpDist .. [[</h4></div><br>
+                    originPlanet .. " - " .. pipePlanet .. " PvP-Border in " .. pvpDist .. [[</h4></div><br>
                             	<div style="color:orange">]] .. system.getWaypointFromPlayerPos() .. [[</div><br>]]
                 screen_1.setHTML(screenHtml)
             end
