@@ -881,7 +881,7 @@ function printNewRadarContacts()
             if showTime then
                 newTargetName = newTargetName .. ' - Time: ' .. seconds_to_clock(system.getArkTime())
             end
-            if radar and radar.hasMatchingTransponder(v) == 1 then
+            if radar and radar.hasMatchingTransponder(v) then
                 newTargetName = newTargetName .. " - [Ally] Owner: " .. getFriendlyDetails(v)
                 if not borderActive then
                     borderColor = "green"
@@ -889,7 +889,7 @@ function printNewRadarContacts()
                     borderActive = true
                     unit.setTimer("cleanBorder", 1)
                 end
-            elseif radar.isConstructAbandoned(v) == 1 then
+            elseif radar.isConstructAbandoned(v) then
                 newTargetName = newTargetName .. " - Abandoned"
             else
                 system.playSound("contact.mp3")
@@ -966,8 +966,8 @@ function updateRadar(match)
         local list = {}
         for str in constructList do
             local id = tonumber(str:match('"constructId":"([%d]*)"'))
-            local tagged = radar.hasMatchingTransponder(id) == 0 and true or false
-            if radar and radar.hasMatchingTransponder(id) == 1 then
+            local tagged = not radar.hasMatchingTransponder(id)
+            if radar and radar.hasMatchingTransponder(id) then
                 allies[#allies + 1] = id
             end
             if radar.getThreatRateFrom(id) > 1 then
@@ -979,7 +979,7 @@ function updateRadar(match)
             if match and tagged and
                 not
                 (
-                    radar.isConstructAbandoned(id) == 1 and #radar.getConstructIds() > amountToFilterOutAbandonedConstructs
+                    radar.isConstructAbandoned(id) and #radar.getConstructIds() > amountToFilterOutAbandonedConstructs
                     and
                     not (radar.isConstructIdentified(id)
                         or id == radar.getTargetId())) then
