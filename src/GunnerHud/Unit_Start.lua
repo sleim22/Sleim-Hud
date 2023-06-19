@@ -125,7 +125,7 @@ function getFriendlyDetails(id)
 end
 
 function printNewRadarContacts()
-    if zone == 1 or printSZContacts then
+    if zone or printSZContacts then
         local newTargetCounter = 0
         for k, v in pairs(newRadarContacts) do
             if newTargetCounter > 10 then

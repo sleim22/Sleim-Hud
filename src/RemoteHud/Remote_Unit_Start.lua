@@ -139,7 +139,7 @@ end
 
 function updatePipeInfo()
 	currentPos = construct.getWorldPosition()
-	local notPvPZone = construct.isInPvPZone() == 0
+	local notPvPZone = not construct.isInPvPZone()
 	local pvpDist = construct.getDistanceToSafeZone()
 	if pvpDist < 0 then pvpDist = pvpDist * (-1) end
 
