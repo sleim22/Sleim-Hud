@@ -38,7 +38,7 @@ targetVektorFromTarget = {}
 function getPointFromTarget()
     local targetId = radar.getTargetId()
 
-    if targetId == 0 or radar.isConstructIdentified(targetId) == 0 then
+    if targetId == 0 or not radar.isConstructIdentified(targetId) then
         system.print("No target")
         return
     end

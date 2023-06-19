@@ -7,7 +7,7 @@ ShieldDisplay.resFactorY = screenHeight / 1080
 
 ShieldDisplay.totalWidth = 300 * ShieldDisplay.resFactorX
 ShieldDisplay.totalHeight = 200 * ShieldDisplay.resFactorY
-if (calculating and shield.isActive() == 1) or shield.isVenting() == 1 or ventCd > 0 then
+if (calculating and shield.isActive()) or shield.isVenting() or ventCd > 0 then
 ShieldDisplay.HTML = [[
   <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;fill:white;stroke:#80ffff;font-weight:bold">
 

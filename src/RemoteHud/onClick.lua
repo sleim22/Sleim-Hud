@@ -7,20 +7,17 @@ if x > ShieldDisplay.startX and x < ShieldDisplay.startX + ShieldDisplay.totalWi
     -- AM bar
     if y > ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin and
         y < ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin + 10 then
-
         local remaining = ShieldRes.maxPool - (ShieldRes[2][1] + ShieldRes[3][1] + ShieldRes[4][1])
         if xClicked <= remaining then
             ShieldRes[1][1] = xClicked
         else
             ShieldRes[1][1] = remaining
         end
-
     end
 
     -- EM bar
     if y > ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 2 and
         y < ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 2 + 10 then
-
         local remaining = ShieldRes.maxPool - (ShieldRes[1][1] + ShieldRes[3][1] + ShieldRes[4][1])
         if xClicked <= remaining then
             ShieldRes[2][1] = xClicked
@@ -54,14 +51,13 @@ if x > ShieldDisplay.startX and x < ShieldDisplay.startX + ShieldDisplay.totalWi
     -- buttons
     if y > ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 5 and
         y < ShieldDisplay.startY + ShieldDisplay.barStart + ShieldDisplay.barMargin * 5 + 40 then
-
         -- Set Button
         if x > ShieldDisplay.startX + 30 * ShieldDisplay.resFactorX and
             x < ShieldDisplay.startX + 30 * ShieldDisplay.resFactorX + 50 * ShieldDisplay.resFactorX then
             local currentRes = shield.getResistances()
             if not
                 (
-                currentRes[1] == ShieldRes[1][1] and currentRes[2] == ShieldRes[2][1] and
+                    currentRes[1] == ShieldRes[1][1] and currentRes[2] == ShieldRes[2][1] and
                     currentRes[3] == ShieldRes[3][1] and
                     currentRes[4] == ShieldRes[4][1]) then
                 local setWorked = shield.setResistances(ShieldRes[1][1], ShieldRes[2][1], ShieldRes[3][1],
@@ -89,9 +85,9 @@ if x > ShieldDisplay.startX and x < ShieldDisplay.startX + ShieldDisplay.totalWi
             x <
             ShieldDisplay.startX + ShieldDisplay.resBarWidth + ShieldDisplay.textMargin * 2 +
             80 * ShieldDisplay.resFactorX then
-            if shield.isVenting() == 0 and shield.getShieldHitpoints() < shield.getMaxShieldHitpoints() then
+            if not shield.isVenting() and shield.getShieldHitpoints() < shield.getMaxShieldHitpoints() then
                 local started = shield.startVenting()
-                if started == 1 then
+                if started then
                     unit.stopTimer("dps")
                     dpmTable = {}
                     counter = 1
@@ -108,7 +104,9 @@ if x > ShieldDisplay.startX and x < ShieldDisplay.startX + ShieldDisplay.totalWi
 
     local used = ShieldRes[1][1] + ShieldRes[2][1] + ShieldRes[3][1] + ShieldRes[4][1]
 
-    if math.floor(ShieldRes.maxPool * 100) == math.floor(used * 100) then ShieldRes.currentPool = 0 else
+    if math.floor(ShieldRes.maxPool * 100) == math.floor(used * 100) then
+        ShieldRes.currentPool = 0
+    else
         ShieldRes.currentPool = ShieldRes.maxPool - used
     end
 end

@@ -1,12 +1,12 @@
-showWeapons = true --export: Shows Weapon Widgets in 3rd person
-showShield = true --export: shows Shield Status
-showAllies = true --export: adds info about allies
-showThreats = true --export: adds info about Threats
-printSZContacts = false --export: print new Contacs in Safezone, default off
+showWeapons = true            --export: Shows Weapon Widgets in 3rd person
+showShield = true             --export: shows Shield Status
+showAllies = true             --export: adds info about allies
+showThreats = true            --export: adds info about Threats
+printSZContacts = false       --export: print new Contacs in Safezone, default off
 printLocationOnContact = true --export: print own location on new target
-showTime = true --export: Shows Time when new Targets enter radar range or leave
-maxAllies = 10 --export: max Amount for detailed info about Allies, reduce if overlapping with threat info
-tempRadarTime = 200 --export: temporary Radar time in seconds until it gets destroyed
+showTime = true               --export: Shows Time when new Targets enter radar range or leave
+maxAllies = 10                --export: max Amount for detailed info about Allies, reduce if overlapping with threat info
+tempRadarTime = 200           --export: temporary Radar time in seconds until it gets destroyed
 probil = 0
 targetSpeed = 0
 oldSpeed = 0
@@ -33,8 +33,8 @@ rollInput = 0
 yawInput = 0
 drift = false
 pitchSpeedFactor = 0.8 --export: This factor will increase/decrease the player input along the pitch axis<br>(higher value may be unstable)<br>Valid values: Superior or equal to 0.01
-yawSpeedFactor = 1 --export: This factor will increase/decrease the player input along the yaw axis<br>(higher value may be unstable)<br>Valid values: Superior or equal to 0.01
-rollSpeedFactor = 1.5 --export: This factor will increase/decrease the player input along the roll axis<br>(higher value may be unstable)<br>Valid values: Superior or equal to 0.01
+yawSpeedFactor = 1     --export: This factor will increase/decrease the player input along the yaw axis<br>(higher value may be unstable)<br>Valid values: Superior or equal to 0.01
+rollSpeedFactor = 1.5  --export: This factor will increase/decrease the player input along the roll axis<br>(higher value may be unstable)<br>Valid values: Superior or equal to 0.01
 screenHeight = system.getScreenHeight()
 screenWidth = system.getScreenWidth()
 unit.hideWidget()
@@ -258,7 +258,6 @@ function drawFuelInfo()
                         </tr>]]
     end
     for i = 1, #spacefueltank do
-
         fuelHtml = fuelHtml .. addFuelTank(spacefueltank[i], i)
     end
     if atmofueltank_size > 0 then
@@ -291,7 +290,7 @@ function brakeHud()
                             position: fixed;
                             left: 50%;
                             bottom: 25%;
-                            transform: translateX(-50%); 
+                            transform: translateX(-50%);
                             text-align: center;
                             color: red;
                             text-shadow: 2px 2px 2px black;
@@ -358,7 +357,7 @@ function speedInfo()
                                             }
                                         table.speed td{
                                             width: 110px;
-                                        }          
+                                        }
                                         </style>
                                             <table class="speed">
                                                 <tr>
@@ -480,7 +479,7 @@ function drawEnemyDPS()
     local kiStress = math.floor(sRR[3] * 100)
     local thStress = math.floor(sRR[4] * 100)
 
-    if (calculating and shield.isActive() == 1) or shield.isVenting() == 1 or ventCd > 0 then
+    if (calculating and shield.isActive()) or shield.isVenting() or ventCd > 0 then
         enemyDPSHtml = [[
                     <style>
                         .enemyDPS{
@@ -498,7 +497,7 @@ function drawEnemyDPS()
                         }
                         table.resTable th {
                             width: 33% ;
-                        } 
+                        }
                     </style>
                     <div class="enemyDPS">
                         <h3>Enemy-DPS: ]] .. dps .. [[</h3>
@@ -566,7 +565,8 @@ stressBarHeight = "5"
 function drawShield()
     shieldHp = shield.getShieldHitpoints()
     shieldPercent = shieldHp / shieldMax * 100
-    if shieldPercent == 100 then shieldPercent = "100"
+    if shieldPercent == 100 then
+        shieldPercent = "100"
     else
         shieldPercent = string.format('%0.2f', shieldPercent)
     end
@@ -575,8 +575,8 @@ function drawShield()
                     <style>
                     .health-bar {
                         position: fixed;
-                        width: 13em; 
-                        padding: 1vh; 
+                        width: 13em;
+                        padding: 1vh;
                         bottom: 5vh;
                         left: 50%;
                         transform: translateX(-50%);
@@ -612,8 +612,8 @@ function drawShield()
                     <style>
                     .stress-health-bar {
                         position: fixed;
-                        width: 13em; 
-                        padding: 1vh; 
+                        width: 13em;
+                        padding: 1vh;
                         bottom:]] .. stressBarHeight .. [[vh;
                         left: 50%;
                         transform: translateX(-50%);
@@ -631,7 +631,7 @@ function drawShield()
                         padding: 5px;
                         border-radius: 5vh;
                         background: #ff0000;
-                        opacity: 0.8;  
+                        opacity: 0.8;
                         width: ]] .. coreStressPercent .. [[%;
                         height: 40px;
                         position: relative;
@@ -645,11 +645,11 @@ function drawShield()
                         </div>
                     </html>
                     ]]
-    if shield.isVenting() == 1 then
+    if shield.isVenting() then
         stressBarHeight = "15"
         venting = "Venting "
         healthHtml = coreStressBar .. shieldHealthBar
-    elseif shield.isActive() == 0 or shield.getShieldHitpoints() == 0 then
+    elseif not shield.isActive() or shield.getShieldHitpoints() == 0 then
         stressBarHeight = "5"
         healthHtml = coreStressBar
     else
@@ -676,7 +676,6 @@ function drawPlanetsOnScreen()
             if su < 10 then
                 deth = 250 - 800 * (distance / 1000 / 200 / 40)
             elseif su < 40 then
-
                 deth = 20
             end
             if xP > 0 and yP > 0 then
@@ -698,13 +697,15 @@ function drawPlanetsOnScreen()
     end
 end
 
-aliencores = { [1] = {
-    name = "Alpha",
-    pos = { 33946188.8008, 71382020.5906, 28850112.1181 }
-}, [2] = {
-    name = "Beta",
-    pos = { -145633811.1992, -10577969.4094, -739352.8819 }
-},
+aliencores = {
+    [1] = {
+        name = "Alpha",
+        pos = { 33946188.8008, 71382020.5906, 28850112.1181 }
+    },
+    [2] = {
+        name = "Beta",
+        pos = { -145633811.1992, -10577969.4094, -739352.8819 }
+    },
     [3] = {
         name = "Epsilon",
         pos = { 48566188.8008, 19622030.5906, 101000112.1181 }
@@ -732,7 +733,8 @@ aliencores = { [1] = {
     [9] = {
         name = "Iota",
         pos = { 966188.8008, -149277969.4094, -739352.8819 }
-    }, [10] = {
+    },
+    [10] = {
         name = "Gamma",
         pos = { -64333811.1992, 55522030.5906, -14399887.8819 }
     },
@@ -971,15 +973,15 @@ function updateRadar(match)
             if radar.getThreatRateFrom(id) > 1 then
                 threats[#threats + 1] = id
             end
-            local ident = radar.isConstructIdentified(id) == 1
+            local ident = radar.isConstructIdentified(id)
             local randomid = getShortName(id)
             str = string.gsub(str, 'name":"', 'name":"' .. randomid .. ' - ')
             if match and tagged and
                 not
                 (
-                radar.isConstructAbandoned(id) == 1 and #radar.getConstructIds() > amountToFilterOutAbandonedConstructs
+                    radar.isConstructAbandoned(id) == 1 and #radar.getConstructIds() > amountToFilterOutAbandonedConstructs
                     and
-                    not (radar.isConstructIdentified(id) == 1
+                    not (radar.isConstructIdentified(id)
                         or id == radar.getTargetId())) then
                 list[#list + 1] = str
             elseif not match and not tagged then
@@ -1001,7 +1003,6 @@ function updateRadar(match)
                 specialRadar = true
                 specialTargetRadar()
             end
-
         end
         return '{"constructsList":[' .. table.concat(list, ',') .. '],' .. data:match('"elementId":".+')
     end
@@ -1309,10 +1310,9 @@ function drawEnemyInfoDmgBar()
     if weapon_1 then
         local targetId = radar.getTargetId()
 
-        if targetId == 0 or radar.isConstructIdentified(targetId) == 0 then
+        if targetId == 0 or not radar.isConstructIdentified(targetId) then
             enemyInfoDmg = "";
         else
-
             dmgDone = dmgTable[targetId] or 0;
             dmgPercent = (dmgDone / 100000)
             if dmgPercent > 100 then dmgPercent = 100 end
@@ -1365,7 +1365,7 @@ function drawEnemyInfoDmgBar()
                             width: 500px;
                             color: #80ffff;
                         }
-                    
+
                         .dmg-bar {
                             background: #142027;
                             color: white;
@@ -1374,19 +1374,19 @@ function drawEnemyInfoDmgBar()
                             border: 1px solid;
                             border-color: #098dfe;
                         }
-                    
+
                         .dmgBarFullness {
                             padding: 5px;
                             border-radius: 5vh;
                             height: 95%;
                         }
-                    
+
                         table.dmgBar {
                             table-layout: fixed;
                             border-spacing: 0 0px;
                             border-collapse: separate;
                         }
-                    
+
                         table.dmgBar td {
                             width: 110px;
                         }
@@ -1457,7 +1457,7 @@ function crossHair()
         screenWidth * ocrossHair[1] ..
         [[" cy="]] ..
         screenHeight * ocrossHair[2] .. [[" r="5" stroke="gray" stroke-width="2" style="fill-opacity:0" />
-    </svg> 
+    </svg>
                     ]]
 end
 
@@ -1513,7 +1513,8 @@ end
 customWaypointsAR = ""
 function drawCustomWaypointsOnScreen()
     if lshiftPressed and hasCustomWaypoints then
-        customWaypointsAR = [[<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">]]
+        customWaypointsAR =
+        [[<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">]]
         for _, v in pairs(customWaypoints) do
             local point = vec3(zeroConvertToWorldCoordinates(v.pos))
             local distance = (point - vec3(construct.getWorldPosition())):len()
