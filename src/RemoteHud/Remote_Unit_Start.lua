@@ -2,9 +2,11 @@ pitchInput = 0
 rollInput = 0
 yawInput = 0
 drift = false
-pitchSpeedFactor = 0.8 --export: This factor will increase/decrease the player input along the pitch axis<br>(higher value may be unstable)<br>Valid values: Superior or equal to 0.01
-yawSpeedFactor = 1     --export: This factor will increase/decrease the player input along the yaw axis<br>(higher value may be unstable)<br>Valid values: Superior or equal to 0.01
-rollSpeedFactor = 1.5  --export: This factor will increase/decrease the player input along the roll axis<br>(higher value may be unstable)<br>Valid values: Superior or equal to 0.01
+local speedBoxPosY = 35 --export: Percent the speed info is from the bottom
+local speedBoxPosX = 60 --export: Percent the speed info is from the left
+pitchSpeedFactor = 0.8  --export: This factor will increase/decrease the player input along the pitch axis<br>(higher value may be unstable)<br>Valid values: Superior or equal to 0.01
+yawSpeedFactor = 1      --export: This factor will increase/decrease the player input along the yaw axis<br>(higher value may be unstable)<br>Valid values: Superior or equal to 0.01
+rollSpeedFactor = 1.5   --export: This factor will increase/decrease the player input along the roll axis<br>(higher value may be unstable)<br>Valid values: Superior or equal to 0.01
 screenHeight = system.getScreenHeight()
 screenWidth = system.getScreenWidth()
 unit.hideWidget()
@@ -334,8 +336,8 @@ function speedInfo()
                     table.speed{
                         position: fixed;
                         table-layout: fixed;
-                        left: 60%;
-                        bottom: 35%;
+                        left: ]] .. speedBoxPosX .. [[%;
+                        bottom:  ]] .. speedBoxPosY .. [[%;
                         border-spacing: 0 10px;
                         border-collapse: separate;
                         }
